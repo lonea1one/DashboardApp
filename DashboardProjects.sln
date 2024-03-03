@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34511.84
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DashboardProjects", "DashboardProjects\DashboardProjects.csproj", "{637619BE-6903-4505-BD86-29F2290ADE55}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataAccess", "DataAccess\DataAccess.csproj", "{99DA93AF-7B93-45D5-B8E8-9D2BAEC6356D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{637619BE-6903-4505-BD86-29F2290ADE55}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{637619BE-6903-4505-BD86-29F2290ADE55}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{637619BE-6903-4505-BD86-29F2290ADE55}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{637619BE-6903-4505-BD86-29F2290ADE55}.Release|Any CPU.Build.0 = Release|Any CPU
+		{99DA93AF-7B93-45D5-B8E8-9D2BAEC6356D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{99DA93AF-7B93-45D5-B8E8-9D2BAEC6356D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{99DA93AF-7B93-45D5-B8E8-9D2BAEC6356D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{99DA93AF-7B93-45D5-B8E8-9D2BAEC6356D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {678C99CB-6D82-4C0D-A642-72E9D85BCCB3}
+	EndGlobalSection
+EndGlobal

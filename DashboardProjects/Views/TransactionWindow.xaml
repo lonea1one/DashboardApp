@@ -1,0 +1,1104 @@
+﻿<Window x:Class="DashboardProjects.Views.TransactionWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:DashboardProjects.ViewModels" 
+        xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
+        xmlns:iv="clr-namespace:DashboardProjects.Behaviors" 
+        xmlns:conv="clr-namespace:DashboardProjects.Converters"
+        mc:Ignorable="d"
+        Height="910" 
+        Width="1400" 
+        WindowStartupLocation="CenterScreen" 
+        Background="Transparent"
+        FontFamily="/Assets/Fonts/#Oswald Regular">
+
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="PreviewKeyDown">
+            <i:InvokeCommandAction Command="{Binding WindowKeyDowCommand}"
+                                   PassEventArgsToCommand="True"/>
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+    
+    <Window.DataContext>
+        <vm:TransactionViewModel/>
+    </Window.DataContext>
+
+    <Window.Resources>
+        <conv:BooleanToOpacityConverter x:Key="BooleanToOpacityConverter"/>
+        <conv:BalanceToColorConverter x:Key="BalanceToColorConverter"/>
+        <conv:CurrencyFormatConverter x:Key="CurrencyFormatConverter"/>
+        <conv:ValueToArrowDirectionConverter x:Key="ValueToArrowDirectionConverter"/>
+    </Window.Resources>
+
+    <Grid Background="#25292E">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="40"/>
+            <RowDefinition Height="35"/>
+            <RowDefinition/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0"
+              Background="#141419">
+            <StackPanel VerticalAlignment="Center" 
+                        HorizontalAlignment="Center">
+
+                <TextBlock Text="Dashboard" 
+                           FontSize="20" 
+                           FontWeight="SemiBold"
+                           FontFamily="Roboto" 
+                           Foreground="#f0f0f0"/>
+            </StackPanel>
+        </Grid>
+
+        <Grid Grid.Row="0" 
+              Panel.ZIndex="1"
+              VerticalAlignment="Bottom" 
+              Height="1" 
+              Background="#2f3034"/>
+
+        <Grid Grid.Row="1"
+              Background="#2f3438"
+              VerticalAlignment="Center">
+
+            <ListBox x:Name="YearLb"
+                     Width="100"
+                     MinHeight="35"
+                     BorderThickness="0"
+                     Background="#2f3438"
+                     SelectionMode="Extended"
+                     ItemsSource="{Binding Years}">
+
+                <ListBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal"
+                                    HorizontalAlignment="Center"/>
+                    </ItemsPanelTemplate>
+                </ListBox.ItemsPanel>
+
+                <i:Interaction.Behaviors>
+                    <iv:ListBoxSelectionBehavior SelectedItems="{Binding SelectedYears}" />
+                </i:Interaction.Behaviors>
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="PreviewMouseLeftButtonDown">
+                        <i:InvokeCommandAction Command="{Binding LbMouseLeftButtonDownCommand}" 
+                                               PassEventArgsToCommand="True"/>
+                    </i:EventTrigger>
+                    <i:EventTrigger EventName="PreviewMouseMove">
+                        <i:InvokeCommandAction Command="{Binding LbMouseMoveCommand}" 
+                                               PassEventArgsToCommand="True"/>
+                    </i:EventTrigger>
+                    <i:EventTrigger EventName="PreviewMouseLeftButtonUp">
+                        <i:InvokeCommandAction Command="{Binding LbMouseLeftButtonUpCommand}" 
+                                               PassEventArgsToCommand="True"/>
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+
+            </ListBox>
+        </Grid>
+
+        <Grid Grid.Row="2"
+              Margin="10">
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition MinWidth="550"/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+
+            <Grid Grid.Column="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="75"/>
+                    <RowDefinition/>
+                    <RowDefinition Height="85"/>
+                </Grid.RowDefinitions>
+
+                <Grid Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+
+                    <Border Grid.Column="0"
+                            Margin="5 10"
+                            CornerRadius="15"
+                            Background="#2f3438">
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition MaxWidth="60"/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+
+                            <Grid Grid.Column="0"
+                                  HorizontalAlignment="Center"
+                                  VerticalAlignment="Center"
+                                  Margin="7 5 5 5">
+
+                                <Button Content="{DynamicResource Capital}"
+                                        Style="{DynamicResource IconButtonsStyle}"
+                                        Tag="IsJustButton"/>
+                            </Grid>
+
+                            <Grid Grid.Column="1">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
+
+                                <Grid Grid.Row="0"
+                                      VerticalAlignment="Bottom"
+                                      HorizontalAlignment="Right"
+                                      Margin="0 5 20 0">
+
+                                    <TextBlock Text="КАПИТАЛ"
+                                               FontSize="14"
+                                               Foreground="#D9D9D9"/>
+                                </Grid>
+
+                                <Grid Grid.Row="1"
+                                      VerticalAlignment="Center"
+                                      HorizontalAlignment="Right"
+                                      Margin="0 0 20 5">
+                                    
+                                    <TextBlock Text="{Binding TotalBalance}"
+                                               FontSize="12"
+                                               Foreground="#01A4F6"/>
+                                </Grid>
+                            </Grid>
+                        </Grid>
+                    </Border>
+
+                    <Border Grid.Column="1"
+                            Margin="5 10"
+                            CornerRadius="15"
+                            Background="#2f3438">
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition MaxWidth="60"/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+
+                            <Grid Grid.Column="0"
+                                  HorizontalAlignment="Center"
+                                  VerticalAlignment="Center"
+                                  Margin="5 5 5 5">
+
+                                <Button Content="{DynamicResource ExpenseIncome}"
+                                        Style="{DynamicResource IconButtonsStyle}"
+                                        Tag="IsJustButton"/>
+                            </Grid>
+
+                            <Grid Grid.Column="1">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
+
+                                <Grid Grid.Row="0"
+                                      VerticalAlignment="Bottom"
+                                      HorizontalAlignment="Right"
+                                      Margin="0 5 20 0">
+
+                                    <TextBlock Text="ДОХОДЫ"
+                                               FontSize="14"
+                                               Foreground="#D9D9D9"/>
+                                </Grid>
+
+                                <Grid Grid.Row="1"
+                                      VerticalAlignment="Center"
+                                      HorizontalAlignment="Right"
+                                      Margin="0 0 20 5">
+                                    
+                                    <TextBlock Text="{Binding TotalIncomeSum}"
+                                               FontSize="12"
+                                               Foreground="#4EF06D"/>
+                                </Grid>
+                            </Grid>
+                        </Grid>
+                    </Border>
+
+                    <Border Grid.Column="2"
+                            Margin="5 10"
+                            CornerRadius="15"
+                            Background="#2f3438">
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition MaxWidth="60"/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+
+                            <Grid Grid.Column="0"
+                                  HorizontalAlignment="Center"
+                                  VerticalAlignment="Center"
+                                  Margin="5">
+
+                                <Button Content="{DynamicResource ExpenseIncome}"
+                                        Style="{DynamicResource IconButtonsStyle}"
+                                        Tag="IsJustButton"/>
+                            </Grid>
+
+                            <Grid Grid.Column="1">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
+
+                                <Grid Grid.Row="0"
+                                      VerticalAlignment="Bottom"
+                                      HorizontalAlignment="Right"
+                                      Margin="0 5 20 0">
+                                    
+                                    <TextBlock Text="РАСХОДЫ"
+                                               FontSize="14"
+                                               Foreground="#D9D9D9"/>
+                                </Grid>
+
+                                <Grid Grid.Row="1"
+                                      VerticalAlignment="Center"
+                                      HorizontalAlignment="Right"
+                                      Margin="0 0 20 5">
+                                    
+                                    <TextBlock Text="{Binding TotalExpenseSum}"
+                                               FontSize="12"
+                                               Foreground="#FF3E58"/>
+                                </Grid>
+                            </Grid>
+                        </Grid>
+                    </Border>
+
+                </Grid>
+
+                <Grid Grid.Row="1"
+                      Background="#25292E">
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+
+                    <Grid Grid.Column="0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="170"/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+
+                        <Grid Grid.Column="0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <lvc:PieChart InnerRadius="75"
+                                          Name="ExpensePieChart"
+                                          Margin="0 0 0 10"
+                                          Height="140"
+                                          Width="140"
+                                          Series="{Binding ExpenseCollection}"
+                                          DataTooltip="{x:Null}"
+                                          IsHitTestVisible="{Binding IsChartExpenseAvailable}"
+                                          DataHoverCommand="{Binding PieChartExpenseDataHoverCommand}"
+                                          DataClickCommand="{Binding PieChartExpenseDataClickCommand}">
+
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="MouseLeave">
+                                        <i:InvokeCommandAction Command="{Binding PieChartExpenseMouseLeaveCommand}" 
+                                                               PassEventArgsToCommand="True"/>
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
+
+                            </lvc:PieChart>
+
+                            <Grid HorizontalAlignment="Center" 
+                                  VerticalAlignment="Center">
+
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <TextBlock Text="{Binding SelectedExpenseSum}" 
+                                           HorizontalAlignment="Center"
+                                           FontSize="12"
+                                           Foreground="#FF3E58"/>
+                                <TextBlock Grid.Row="1"
+                                           Text="{Binding PercentageExpense}" 
+                                           HorizontalAlignment="Center"
+                                           FontSize="11"
+                                           Foreground="#EAEAEA"/>
+                            </Grid>
+                        </Grid>
+
+                        <Grid Grid.Column="1">
+                            <ListBox x:Name="ExpenseLb"
+                                     MinHeight="180"
+                                     MinWidth="100"
+                                     Margin="5 30 0 20"
+                                     BorderThickness="0"
+                                     VerticalAlignment="Center"
+                                     SelectionMode="Extended"
+                                     IsEnabled="{Binding HasExpenseData}"
+                                     ItemsSource="{Binding ExpenseCategories}">
+
+                                <i:Interaction.Behaviors>
+                                    <iv:ListBoxSelectionBehavior SelectedItems="{Binding SelectedExpenses}" />
+                                </i:Interaction.Behaviors>
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="PreviewMouseLeftButtonDown">
+                                        <i:InvokeCommandAction Command="{Binding LbMouseLeftButtonDownCommand}" 
+                                                               PassEventArgsToCommand="True"/>
+                                    </i:EventTrigger>
+                                    <i:EventTrigger EventName="PreviewMouseMove">
+                                        <i:InvokeCommandAction Command="{Binding LbMouseMoveCommand}" 
+                                                               PassEventArgsToCommand="True"/>
+                                    </i:EventTrigger>
+                                    <i:EventTrigger EventName="PreviewMouseLeftButtonUp">
+                                        <i:InvokeCommandAction Command="{Binding LbMouseLeftButtonUpCommand}" 
+                                                               PassEventArgsToCommand="True"/>
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
+
+                            </ListBox>
+                        </Grid>
+                    </Grid>
+
+                    <Grid Grid.Column="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="170"/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+
+                        <Grid Grid.Column="0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <lvc:PieChart InnerRadius="75"
+                                          Name="IncomePieChart"
+                                          Margin="0 0 0 10"
+                                          Height="140"
+                                          Width="140"
+                                          Series="{Binding IncomeCollection}"
+                                          DataTooltip="{x:Null}"
+                                          IsHitTestVisible="{Binding IsChartIncomeAvailable}"
+                                          DataHoverCommand="{Binding PieChartExpenseDataHoverCommand}"
+                                          DataClickCommand="{Binding PieChartExpenseDataClickCommand}">
+
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="MouseLeave">
+                                        <i:InvokeCommandAction Command="{Binding PieChartExpenseMouseLeaveCommand}" 
+                                                               PassEventArgsToCommand="True"/>
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
+
+                            </lvc:PieChart>
+                            
+                            <Grid HorizontalAlignment="Center" 
+                                  VerticalAlignment="Center">
+
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <TextBlock Text="{Binding SelectedIncomeSum}" 
+                                           HorizontalAlignment="Center"
+                                           FontSize="12"
+                                           Foreground="#4EF06D"/>
+                                <TextBlock Grid.Row="1"
+                                           Text="{Binding PercentageIncome}" 
+                                           HorizontalAlignment="Center"
+                                           FontSize="11"
+                                           Foreground="#EAEAEA"/>
+                            </Grid>
+                        </Grid>
+
+                        <Grid Grid.Column="1">
+                            <ListBox x:Name="IncomeLb"
+                                     MinHeight="180"
+                                     MinWidth="100"
+                                     Margin="5 30 0 20"
+                                     BorderThickness="0"    
+                                     VerticalAlignment="Center"
+                                     SelectionMode="Extended"
+                                     IsEnabled="{Binding HasIncomeData}"
+                                     ItemsSource="{Binding IncomeCategories}">
+
+                                <i:Interaction.Behaviors>
+                                    <iv:ListBoxSelectionBehavior SelectedItems="{Binding SelectedIncomes}" />
+                                </i:Interaction.Behaviors>
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="PreviewMouseLeftButtonDown">
+                                        <i:InvokeCommandAction Command="{Binding LbMouseLeftButtonDownCommand}" 
+                                                               PassEventArgsToCommand="True"/>
+                                    </i:EventTrigger>
+                                    <i:EventTrigger EventName="PreviewMouseMove">
+                                        <i:InvokeCommandAction Command="{Binding LbMouseMoveCommand}" 
+                                                               PassEventArgsToCommand="True"/>
+                                    </i:EventTrigger>
+                                    <i:EventTrigger EventName="PreviewMouseLeftButtonUp">
+                                        <i:InvokeCommandAction Command="{Binding LbMouseLeftButtonUpCommand}" 
+                                                               PassEventArgsToCommand="True"/>
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
+
+                            </ListBox>
+                        </Grid>
+                    </Grid>
+                </Grid>
+
+                <Grid Grid.Row="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+
+                    <Border Grid.Column="0"
+                            Margin="4 10"
+                            Height="65"
+                            CornerRadius="15"
+                            Background="#2f3438">
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition MaxWidth="40"/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+
+                            <Grid Grid.Column="0"
+                                  HorizontalAlignment="Center"
+                                  VerticalAlignment="Center"
+                                  Margin="5">
+
+                                <Button Content="{DynamicResource One}"
+                                        Style="{DynamicResource IconButtonsStyle}"
+                                        Tag="IsJustButton"/>
+                            </Grid>
+
+                            <Grid Grid.Column="1">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
+
+                                <Grid Grid.Row="0"
+                                      VerticalAlignment="Bottom"
+                                      HorizontalAlignment="Right"
+                                      Margin="0 0 10 0">
+
+                                    <TextBlock Text="FIRST QUARTER"
+                                               FontSize="12"
+                                               Foreground="#D9D9D9"/>
+                                </Grid>
+
+                                <Grid Grid.Row="1"
+                                      VerticalAlignment="Top"
+                                      HorizontalAlignment="Right"
+                                      Margin="0 0 10 0">
+
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="15"/>
+                                        <ColumnDefinition Width="60"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <Grid Grid.Column="0">
+                                        
+                                        <Path Data="{Binding FirstQuartalBalance, Converter={StaticResource ValueToArrowDirectionConverter}}"
+                                              Fill="{Binding FirstQuartalBalance, Converter={StaticResource BalanceToColorConverter}}"
+                                              Stretch="Uniform"
+                                              Width="13" Height="13"/>
+                                    </Grid>
+
+                                    <Grid Grid.Column="1"
+                                          Margin="5 0 0 0"
+                                          HorizontalAlignment="Right">
+                                        
+                                        <TextBlock Text="{Binding FirstQuartalBalance, Converter={StaticResource CurrencyFormatConverter}}"
+                                                   Foreground="{Binding FirstQuartalBalance, Converter={StaticResource BalanceToColorConverter}}"
+                                                   FontSize="13"/>
+                                    </Grid>
+                                </Grid>
+                            </Grid>
+                        </Grid>
+                    </Border>
+
+                    <Border Grid.Column="1"
+                            Margin="4 10"
+                            CornerRadius="15"
+                            Background="#2f3438">
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition MaxWidth="40"/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+
+                            <Grid Grid.Column="0"
+                                  HorizontalAlignment="Center"
+                                  VerticalAlignment="Center"
+                                  Margin="5">
+
+                                <Button Content="{DynamicResource Two}"
+                                        Style="{DynamicResource IconButtonsStyle}"
+                                        Tag="IsJustButton"/>
+                                
+                            </Grid>
+
+                            <Grid Grid.Column="1">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
+
+                                <Grid Grid.Row="0"
+                                      VerticalAlignment="Bottom"
+                                      HorizontalAlignment="Right"
+                                      Margin="0 5 10 0">
+
+                                    <TextBlock Text="SECOND QUARTER"
+                                               FontSize="12"
+                                               Foreground="#D9D9D9"/>
+                                </Grid>
+
+                                <Grid Grid.Row="1"
+                                      VerticalAlignment="Top"
+                                      HorizontalAlignment="Right"
+                                      Margin="0 0 10 0">
+
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="20"/>
+                                        <ColumnDefinition Width="60"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <Grid Grid.Column="0">
+                                        
+                                        <Path Data="{Binding SecondQuartalBalance, Converter={StaticResource ValueToArrowDirectionConverter}}"
+                                              Fill="{Binding SecondQuartalBalance, Converter={StaticResource BalanceToColorConverter}}"
+                                              Stretch="Uniform"
+                                              Width="13" Height="13"/>
+                                    </Grid>
+
+                                    <Grid Grid.Column="1"
+                                          Margin="5 0 0 0"
+                                          HorizontalAlignment="Right">
+
+                                        <TextBlock Text="{Binding SecondQuartalBalance, Converter={StaticResource CurrencyFormatConverter}}"
+                                                   Foreground="{Binding SecondQuartalBalance, Converter={StaticResource BalanceToColorConverter}}"
+                                                   FontSize="13"/>
+                                    </Grid>
+                                </Grid>
+
+                            </Grid>
+                        </Grid>
+                    </Border>
+
+                    <Border Grid.Column="2"
+                            Margin="4 10"
+                            CornerRadius="15"
+                            Background="#2f3438">
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition MaxWidth="40"/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+
+                            <Grid Grid.Column="0"
+                                  HorizontalAlignment="Center"
+                                  VerticalAlignment="Center"
+                                  Margin="5">
+
+                                <Button Content="{DynamicResource Three}"
+                                        Style="{DynamicResource IconButtonsStyle}"
+                                        Tag="IsJustButton"/>
+                                
+                            </Grid>
+
+                            <Grid Grid.Column="1">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
+
+                                <Grid Grid.Row="0"
+                                      VerticalAlignment="Bottom"
+                                      HorizontalAlignment="Right"
+                                      Margin="0 5 10 0">
+
+                                    <TextBlock Text="THIRD QUARTER"
+                                               FontSize="12"
+                                               Foreground="#D9D9D9"/>
+                                </Grid>
+
+                                <Grid Grid.Row="1"
+                                      VerticalAlignment="Top"
+                                      HorizontalAlignment="Right"
+                                      Margin="0 0 10 0">
+
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="15"/>
+                                        <ColumnDefinition Width="60"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <Grid Grid.Column="0">
+
+                                        <Path Data="{Binding ThirdQuartalBalance, Converter={StaticResource ValueToArrowDirectionConverter}}"
+                                              Fill="{Binding ThirdQuartalBalance, Converter={StaticResource BalanceToColorConverter}}"
+                                              Stretch="Uniform"
+                                              Width="13" Height="13"/>
+                                    </Grid>
+
+                                    <Grid Grid.Column="1"
+                                          Margin="5 0 0 0"
+                                          HorizontalAlignment="Right">
+
+                                        <TextBlock Text="{Binding ThirdQuartalBalance, Converter={StaticResource CurrencyFormatConverter}}"
+                                                   Foreground="{Binding ThirdQuartalBalance, Converter={StaticResource BalanceToColorConverter}}"
+                                                   FontSize="13"/>
+                                    </Grid>
+                                </Grid>
+
+                            </Grid>
+                        </Grid>
+                    </Border>
+
+                    <Border Grid.Column="3"
+                            Margin="4 10"
+                            CornerRadius="15"
+                            Background="#2f3438">
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition MaxWidth="40"/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+
+                            <Grid Grid.Column="0"
+                                  HorizontalAlignment="Center"
+                                  VerticalAlignment="Center"
+                                  Margin="5">
+
+                                <Button Content="{DynamicResource Four}"
+                                        Style="{DynamicResource IconButtonsStyle}"
+                                        Tag="IsJustButton"/>
+                                
+                            </Grid>
+
+                            <Grid Grid.Column="1">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
+
+                                <Grid Grid.Row="0"
+                                      VerticalAlignment="Bottom"
+                                      HorizontalAlignment="Right"
+                                      Margin="0 5 10 0">
+
+                                    <TextBlock Text="FOURTH QUARTER"
+                                               FontSize="12"
+                                               Foreground="#D9D9D9"/>
+                                </Grid>
+
+                                <Grid Grid.Row="1"
+                                      VerticalAlignment="Top"
+                                      HorizontalAlignment="Right"
+                                      Margin="0 0 10 0">
+
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="20"/>
+                                        <ColumnDefinition Width="60"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <Grid Grid.Column="0">
+
+                                        <Path Data="{Binding FourdQuartalBalance, Converter={StaticResource ValueToArrowDirectionConverter}}"
+                                              Fill="{Binding FourdQuartalBalance, Converter={StaticResource BalanceToColorConverter}}"
+                                              Stretch="Uniform"
+                                              Width="13" Height="13"/>
+                                    </Grid>
+
+                                    <Grid Grid.Column="1"
+                                          Margin="5 0 0 0"
+                                          HorizontalAlignment="Right">
+
+                                        <TextBlock Text="{Binding FourdQuartalBalance, Converter={StaticResource CurrencyFormatConverter}}"
+                                                   Foreground="{Binding FourdQuartalBalance, Converter={StaticResource BalanceToColorConverter}}"
+                                                   FontSize="13"/>
+                                    </Grid>
+                                </Grid>
+
+                            </Grid>
+                        </Grid>
+                    </Border>
+                </Grid>
+
+            </Grid>
+
+            <Grid Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="70"/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+
+                <Border Grid.Row="0"
+                        CornerRadius="5"
+                        Background="#2f3438"
+                        Margin="10">
+
+                    <StackPanel Orientation="Vertical"
+                                VerticalAlignment="Center">
+                        
+                        <TextBlock VerticalAlignment="Center"
+                                   HorizontalAlignment="Center"
+                                   Text="КАТЕГОРИЯ: РАСХОДЫ ПО МЕСЯЦАМ"
+                                   FontSize="14"
+                                   Foreground="#EAEAEA"/>
+
+                        <StackPanel Orientation="Horizontal"
+                                    HorizontalAlignment="Center">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+
+                                <Grid Grid.Column="0">
+                                    <TextBlock Text="{Binding SelectedExpenseAmount}" 
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"
+                                               Foreground="#D9D9D9" 
+                                               FontSize="12"
+                                               Margin="5 0 5 0"/>
+                                </Grid>
+
+                                <Grid Grid.Column="1">
+                                    <TextBlock Text="{Binding SelectedPercentageExpense}" 
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"
+                                               Foreground="#D9D9D9" 
+                                               FontSize="12"
+                                               Margin="5 0 5 0"/>
+                                </Grid>
+                            </Grid>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <Grid Grid.Row="1">
+                    <lvc:CartesianChart Name="ExpenseChart"
+                                        Margin="10"
+                                        Series="{Binding ChartExpenseCollection}"
+                                        DataHoverCommand="{Binding ExpenseChartDataHoverCommand}">
+
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="MouseLeave">
+                                <i:InvokeCommandAction Command="{Binding ExpenseChartMouseLeaveCommand}" 
+                                                       PassEventArgsToCommand="True"/>
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+
+                        <lvc:CartesianChart.DataTooltip>
+                            <lvc:DefaultTooltip Visibility="Hidden"/>
+                        </lvc:CartesianChart.DataTooltip>
+
+                        <lvc:CartesianChart.AxisY>
+                            <lvc:Axis LabelFormatter="{Binding ExpenseYFormatter}" 
+                                      MinValue="0"
+                                      FontSize="10"
+                                      FontFamily="/Assets/Fonts/#Oswald Regular"
+                                      Foreground="#595959">
+
+                                <lvc:Axis.Separator>
+                                    <lvc:Separator Stroke="#90313131" 
+                                                   StrokeThickness="0.8"/>
+                                </lvc:Axis.Separator>
+
+                            </lvc:Axis>
+
+                        </lvc:CartesianChart.AxisY>
+
+                        <lvc:CartesianChart.AxisX>
+                            <lvc:Axis Labels="{Binding ExpenseLabels}"
+                                      FontSize="10"        
+                                      FontFamily="/Assets/Fonts/#Oswald Regular"
+                                      Foreground="#595959">
+
+                                <lvc:Axis.Separator>
+                                    <lvc:Separator Step="1" 
+                                                   StrokeThickness="0"/>
+                                </lvc:Axis.Separator>
+
+                            </lvc:Axis>
+
+                        </lvc:CartesianChart.AxisX>
+                    </lvc:CartesianChart>
+                </Grid>
+            </Grid>
+
+            <Grid Grid.Column="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="60"/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+
+                <Border Grid.Row="0"
+                        CornerRadius="5"
+                        Background="#2f3438"
+                        Margin="10">
+
+                    <TextBlock VerticalAlignment="Center"
+                               HorizontalAlignment="Center"
+                               Text="БАЛАНС"
+                               FontSize="14"
+                               Foreground="#EAEAEA"/>
+                </Border>
+
+                <Grid Grid.Row="1">
+                    <lvc:CartesianChart Name="BalanceChart"
+                                        Margin="10"
+                                        Series="{Binding BalanceChartSeries}">
+
+                        <lvc:CartesianChart.DataTooltip>
+                            <lvc:DefaultTooltip Visibility="Hidden"/>
+                        </lvc:CartesianChart.DataTooltip>
+
+                        <lvc:CartesianChart.AxisX>
+                            <lvc:Axis FontSize="10"        
+                                      Foreground="#595959"
+                                      FontFamily="/Assets/Fonts/#Oswald Regular"
+                                      Labels="{Binding BalanceLabels}">
+
+                                <lvc:Axis.Separator>
+                                    <lvc:Separator Step="1"
+                                                   Stroke="#90313131" 
+                                                   StrokeThickness="0"/>
+                                </lvc:Axis.Separator>
+
+                            </lvc:Axis>
+                        </lvc:CartesianChart.AxisX>
+                        
+                        <lvc:CartesianChart.AxisY>
+                            <lvc:Axis MinValue="0"
+                                      FontSize="10"
+                                      Foreground="#595959"
+                                      FontFamily="/Assets/Fonts/#Oswald Regular"
+                                      LabelFormatter="{Binding BalanceYFormatter}">
+
+                                <lvc:Axis.Separator>
+                                    <lvc:Separator Stroke="#90313131" 
+                                                   StrokeThickness="0.8"/>
+                                </lvc:Axis.Separator>
+
+                            </lvc:Axis>
+                        </lvc:CartesianChart.AxisY>
+
+                    </lvc:CartesianChart>
+                </Grid>
+            </Grid>
+        </Grid>
+
+        <Grid Grid.Row="3"
+              Margin="10 5 10 10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition MinWidth="550"/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+
+            <Grid Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="70"/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+
+                <Border Grid.Row="0"
+                        CornerRadius="5"
+                        Background="#2f3438"
+                        Margin="10">
+
+                    <StackPanel Orientation="Vertical"
+                                VerticalAlignment="Center">
+
+                        <TextBlock VerticalAlignment="Center"
+                                   HorizontalAlignment="Center"
+                                   Text="КАТЕГОРИЯ: ДОХОДЫ ПО МЕСЯЦАМ"
+                                   FontSize="14"
+                                   Foreground="#EAEAEA"/>
+
+                        <StackPanel Orientation="Horizontal"
+                                    HorizontalAlignment="Center">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+
+                                <Grid Grid.Column="0">
+                                    <TextBlock Text="{Binding SelectedIncomeAmount}" 
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"
+                                               Foreground="#D9D9D9" 
+                                               FontSize="12"
+                                               Margin="5 0 5 0"/>
+                                </Grid>
+
+                                <Grid Grid.Column="1">
+                                    <TextBlock Text="{Binding SelectedPercentageIncome}" 
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"
+                                               Foreground="#D9D9D9" 
+                                               FontSize="12"
+                                               Margin="5 0 5 0"/>
+                                </Grid>
+                            </Grid>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <Grid Grid.Row="1">
+                    <lvc:CartesianChart Name="IncomeChart"
+                                        Margin="10"
+                                        Series="{Binding ChartIncomeCollection}"
+                                        DataHoverCommand="{Binding IncomeChartDataHoverCommand}">
+
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="MouseLeave">
+                                <i:InvokeCommandAction Command="{Binding IncomeChartMouseLeaveCommand}" 
+                                                       PassEventArgsToCommand="True"/>
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+
+                        <lvc:CartesianChart.DataTooltip>
+                            <lvc:DefaultTooltip Visibility="Hidden"/>
+                        </lvc:CartesianChart.DataTooltip>
+
+                        <lvc:CartesianChart.AxisY>
+                            <lvc:Axis LabelFormatter="{Binding IncomeYFormatter}"
+                                      FontFamily="/Assets/Fonts/#Oswald Regular"
+                                      MinValue="0"
+                                      FontSize="10"
+                                      Foreground="#595959">
+
+                                <lvc:Axis.Separator>
+                                    <lvc:Separator Stroke="#90313131" 
+                                                   StrokeThickness="0.8"/>
+                                </lvc:Axis.Separator>
+
+                            </lvc:Axis>
+
+                        </lvc:CartesianChart.AxisY>
+
+                        <lvc:CartesianChart.AxisX>
+                            <lvc:Axis Labels="{Binding IncomeLabels}"
+                                      FontFamily="/Assets/Fonts/#Oswald Regular"
+                                      FontSize="10"        
+                                      Foreground="#595959">
+
+                                <lvc:Axis.Separator>
+                                    <lvc:Separator Step="1" 
+                                                   StrokeThickness="0"/>
+                                </lvc:Axis.Separator>
+
+                            </lvc:Axis>
+
+                        </lvc:CartesianChart.AxisX>
+                    </lvc:CartesianChart>
+                </Grid>
+            </Grid>
+
+            <Grid Grid.Column="2">
+                <Border AllowDrop="True"
+                        VerticalAlignment="Top"
+                        HorizontalAlignment="Left"
+                        BorderThickness="2"
+                        CornerRadius="5"
+                        Width="200"
+                        Background="#25292E"
+                        Margin="10"
+                        Visibility="{Binding UploadVisibility}">
+
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="DragOver">
+                            <i:InvokeCommandAction Command="{Binding FileDragOverCommand}" 
+                                                   PassEventArgsToCommand="True"/>
+                        </i:EventTrigger>
+
+                        <i:EventTrigger EventName="Drop">
+                            <i:InvokeCommandAction Command="{Binding FileDropCommand}" 
+                                                   PassEventArgsToCommand="True"/>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+
+                    <Border.BorderBrush>
+                        <DrawingBrush Viewport="0 0 8 8" 
+                                      ViewportUnits="Absolute" 
+                                      TileMode="Tile">
+                            
+                            <DrawingBrush.Drawing>
+                                <DrawingGroup>
+                                    <GeometryDrawing Brush="#2F3338">
+                                        <GeometryDrawing.Geometry>
+                                            <GeometryGroup>
+                                                <RectangleGeometry Rect="0 0 50 50" />
+                                                <RectangleGeometry Rect="50 50 50 50" />
+                                            </GeometryGroup>
+                                        </GeometryDrawing.Geometry>
+                                    </GeometryDrawing>
+                                </DrawingGroup>
+                            </DrawingBrush.Drawing>
+                        </DrawingBrush>
+                    </Border.BorderBrush>
+
+                    <StackPanel HorizontalAlignment="Center" 
+                                VerticalAlignment="Center">
+                        
+                        <Viewbox Width="50" 
+                                 Height="50">
+                            
+                            <Canvas Width="640" 
+                                    Height="480" 
+                                    ClipToBounds="True">
+
+                                <Path Data="M144 480C64.5 480 0 415.5 0 336c0-62.8 40.2-116.2 96.2-135.9c-.1-2.7-.2-5.4-.2-8.1c0-88.4 71.6-160 160-160c59.3 0 111 32.2 138.7 80.2C409.9 102 428.3 96 448 96c53 0 96 43 96 96c0 12.2-2.3 23.8-6.4 34.6C596 238.4 640 290.1 640 352c0 70.7-57.3 128-128 128H144zm79-217c-9.4 9.4-9.4 24.6 0 33.9s24.6 9.4 33.9 0l39-39V392c0 13.3 10.7 24 24 24s24-10.7 24-24V257.9l39 39c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-80-80c-9.4-9.4-24.6-9.4-33.9 0l-80 80z"
+                                      Fill="#D9D9D9"/>
+                            </Canvas>
+                        </Viewbox>
+
+                        <TextBlock Text="Upload a File" 
+                                   Foreground="#D9D9D9"
+                                   FontSize="14"
+                                   FontWeight="Bold"
+                                   Margin="5" 
+                                   HorizontalAlignment="Center"/>
+                        
+                        <TextBlock Text="Drag Drop files here"
+                                   Foreground="#D9D9D9"
+                                   FontSize="12"
+                                   Margin="5 0 5 5"
+                                   HorizontalAlignment="Center"/>
+                    </StackPanel>
+                </Border>
+                <ProgressBar IsIndeterminate="True"
+                             VerticalAlignment="Top"
+                             HorizontalAlignment="Left"
+                             Minimum="0"
+                             Maximum="100"
+                             Margin="10"
+                             Width="200"
+                             Height="110"
+                             Foreground="#D9D9D9"
+                             Background="#2f3438"
+                             Style="{DynamicResource RoundProgressBarStyle}"
+                             Visibility="{Binding ProgressVisibility}" />
+            </Grid>
+        </Grid>
+    </Grid>
+</Window>
