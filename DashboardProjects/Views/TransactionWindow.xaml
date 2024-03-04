@@ -27,7 +27,6 @@
     </Window.DataContext>
 
     <Window.Resources>
-        <conv:BooleanToOpacityConverter x:Key="BooleanToOpacityConverter"/>
         <conv:BalanceToColorConverter x:Key="BalanceToColorConverter"/>
         <conv:CurrencyFormatConverter x:Key="CurrencyFormatConverter"/>
         <conv:ValueToArrowDirectionConverter x:Key="ValueToArrowDirectionConverter"/>
