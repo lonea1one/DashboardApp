@@ -18,7 +18,7 @@ using Brush = System.Windows.Media.Brush;
 
 namespace DashboardProjects.ViewModels;
 
-public class TransactionViewModel : ViewModelBase
+public class TransactionViewModel : BaseViewModel
 {
 	private ObservableCollection<string>? _expenseCategories;
 	public ObservableCollection<string>? ExpenseCategories

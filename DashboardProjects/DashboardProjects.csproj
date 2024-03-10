@@ -28,6 +28,10 @@
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Assets\Fonts\Oswald-Regular.ttf" />
+    <None Remove="Assets\Images\man.png" />
+    <Resource Include="Assets\Images\man.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
   </ItemGroup>
 
 </Project>
