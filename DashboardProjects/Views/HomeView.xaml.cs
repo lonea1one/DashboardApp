@@ -1,11 +1,12 @@
-using System.Windows.Controls;
+using DashboardProjects.ViewModels;
 
 namespace DashboardProjects.Views;
 
-public partial class HomeView : UserControl
+public partial class HomeView
 {
     public HomeView()
     {
         InitializeComponent();
+        DataContext = new HomeViewModel();
     }
 }

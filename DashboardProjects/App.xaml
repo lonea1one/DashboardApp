@@ -5,7 +5,7 @@
     xmlns:view="clr-namespace:DashboardProjects.Views"
     xmlns:viewmodel="clr-namespace:DashboardProjects.ViewModels"
     Startup="Application_Startup"
-    StartupUri="Views/TransactionWindow.xaml">
+    StartupUri="Views/MainView.xaml">
     
     <Application.Resources>
         <ResourceDictionary>
