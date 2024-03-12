@@ -1,4 +1,4 @@
-﻿using DashboardProjects.Commands;
+using DashboardProjects.Commands;
 using DashboardProjects.Utils;
 using DataAccess;
 using DataAccess.Models;
@@ -16,11 +16,12 @@ using System.Windows.Input;
 using System.Windows.Media;
 using Brush = System.Windows.Media.Brush;
 
+
 namespace DashboardProjects.ViewModels;
 
-public class TransactionViewModel : ViewModelBase
+public class HomeViewModel : BaseViewModel
 {
-	private ObservableCollection<string>? _expenseCategories;
+    private ObservableCollection<string>? _expenseCategories;
 	public ObservableCollection<string>? ExpenseCategories
 	{
 		get => _expenseCategories;
@@ -113,8 +114,6 @@ public class TransactionViewModel : ViewModelBase
 
 	public ICommand FileDragOverCommand { get; private set; }
 	public ICommand FileDropCommand { get; private set; }
-
-	public ICommand WindowKeyDowCommand { get; private set; }
 
 	private string? _selectedExpenseSum;
 	public string? SelectedExpenseSum
@@ -417,7 +416,7 @@ public class TransactionViewModel : ViewModelBase
 		}
 	}
 
-	public TransactionViewModel()
+	public HomeViewModel()
 	{
 		ExpenseCollection = new SeriesCollection();
 		IncomeCollection = new SeriesCollection();
@@ -451,24 +450,11 @@ public class TransactionViewModel : ViewModelBase
 		FileDragOverCommand = new RelayCommand<DragEventArgs>(OnDragOver);
 		FileDropCommand = new RelayCommand<DragEventArgs>(OnFileDrop);
 
-		WindowKeyDowCommand = new RelayCommand<KeyEventArgs>(OnWindowKeyDow);
-
 		MapChart();
 		_ = LoadDataAsync();
 	}
 
 	#region Обработчики событий
-	private static void OnWindowKeyDow(object parameter)
-		{
-			if (parameter is not KeyEventArgs e) return;
-
-			if (e.Key == Key.Escape || e is { Key: Key.System, SystemKey: Key.LeftAlt } || e is { Key: Key.System, SystemKey: Key.RightAlt })
-			{
-				// Отмена действия по умолчанию
-				e.Handled = true;
-			}
-		}
-
 	private void OnPreviewMouseLeftButtonDown(object parameter)
 	{
 		var args = parameter as MouseButtonEventArgs;
@@ -1339,5 +1325,4 @@ public class TransactionViewModel : ViewModelBase
 		return selectionRect.IntersectsWith(itemRect);
 	}
 	#endregion
-
 }

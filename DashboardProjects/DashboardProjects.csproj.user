@@ -12,13 +12,7 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Page Update="Assets\Styles\Styles.xaml">
-      <SubType>Designer</SubType>
-    </Page>
     <Page Update="Controls\CustomToolTip.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Views\TransactionWindow.xaml">
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
