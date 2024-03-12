@@ -6,12 +6,15 @@
     xmlns:viewmodel="clr-namespace:DashboardProjects.ViewModels"
     Startup="Application_Startup"
     StartupUri="Views/MainView.xaml">
-    
+
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Assets/Icons/Icons.xaml" />
-                <ResourceDictionary Source="Assets/Styles/Styles.xaml" />
+                <ResourceDictionary Source="Assets/Styles/IconsStyles.xaml" />
+                <ResourceDictionary Source="Assets/Styles/ListBoxStyles.xaml" />
+                <ResourceDictionary Source="Assets/Styles/ProgressBarStyles.xaml" />
+                <ResourceDictionary Source="Assets/Styles/DataGridStyles.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
             <DataTemplate DataType="{x:Type viewmodel:HomeViewModel}">

@@ -9,6 +9,9 @@
     xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:vm="clr-namespace:DashboardProjects.ViewModels"
+    d:DesignHeight="800"
+    d:DesignWidth="1300"
+    FontFamily="#Oswald Regular"
     mc:Ignorable="d">
 
     <UserControl.DataContext>
@@ -39,6 +42,7 @@
                 MinHeight="35"
                 Background="#2f3438"
                 BorderThickness="0"
+                FontSize="13"
                 ItemsSource="{Binding Years}"
                 SelectionMode="Extended">
 
@@ -328,6 +332,7 @@
                                 Margin="5,30,0,20"
                                 VerticalAlignment="Center"
                                 BorderThickness="0"
+                                FontSize="12"
                                 IsEnabled="{Binding HasExpenseData}"
                                 ItemsSource="{Binding ExpenseCategories}"
                                 SelectionMode="Extended">
@@ -411,6 +416,7 @@
                                 Margin="5,30,0,20"
                                 VerticalAlignment="Center"
                                 BorderThickness="0"
+                                FontSize="12"
                                 IsEnabled="{Binding HasIncomeData}"
                                 ItemsSource="{Binding IncomeCategories}"
                                 SelectionMode="Extended">

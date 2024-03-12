@@ -38,6 +38,8 @@ public class MainViewModel : BaseViewModel
         MinimizeCommand = new MinimizeCommand();
         MaximizeRestoreCommand = new MaximizeRestoreCommand();
         CloseCommand = new CloseCommand();
+        
+        SelectedViewModel = new HomeViewModel();
     }
 
 	private static void OnWindowKeyDow(object parameter)
