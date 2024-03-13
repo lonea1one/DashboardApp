@@ -11,8 +11,8 @@ namespace DashboardProjects.ViewModels;
 
 public class DatabaseViewModel : BaseViewModel
 {
-	private ObservableCollection<string>? _years;
-	public ObservableCollection<string>? Years
+	private ObservableCollection<string> _years;
+	public ObservableCollection<string> Years
 	{
 		get => _years;
 		set
@@ -22,14 +22,15 @@ public class DatabaseViewModel : BaseViewModel
 		}
 	}
 
-	private ObservableCollection<int>? _selectedYears;
-	public ObservableCollection<int>? SelectedYears
+	private ObservableCollection<int> _selectedYears;
+	public ObservableCollection<int> SelectedYears
 	{
 		get => _selectedYears;
 		set
 		{
 			_selectedYears = value;
 			OnPropertyChanged(nameof(SelectedYears));
+			ApplyFilters();
 		}
 	}
 
@@ -41,6 +42,17 @@ public class DatabaseViewModel : BaseViewModel
 		{
 			_transactions = value;
 			OnPropertyChanged(nameof(Transactions));
+		}
+	}
+
+	private ObservableCollection<Transaction> _filteredTransactions;
+	public ObservableCollection<Transaction> FilteredTransactions
+	{
+		get => _filteredTransactions;
+		set
+		{
+			_filteredTransactions = value;
+			OnPropertyChanged(nameof(FilteredTransactions));
 		}
 	}
 
@@ -81,10 +93,21 @@ public class DatabaseViewModel : BaseViewModel
 		}
 	}
 
+	private string _searchText;
+	public string SearchText
+	{
+		get => _searchText;
+		set
+		{
+			_searchText = value;
+			OnPropertyChanged(nameof(SearchText));
+			ApplyFilters();
+		}
+	}
 	public DatabaseViewModel()
 	{
-		Years = [];
-		SelectedYears = [];
+		Years = new ObservableCollection<string>();
+		SelectedYears = new ObservableCollection<int>();
 
 		LbMouseLeftButtonDownCommand = new RelayCommand<MouseButtonEventArgs>(OnPreviewMouseLeftButtonDown);
 		LbMouseMoveCommand = new RelayCommand<MouseEventArgs>(OnPreviewMouseMove);
@@ -100,15 +123,18 @@ public class DatabaseViewModel : BaseViewModel
 		var transactions = await context.Transactions.ToListAsync();
 		var years = await context.Transactions.Select(m => m.Date.Year.ToString()).Distinct().ToListAsync();
 
-		// Обновление UI происходит в потоке UI
-		Application.Current.Dispatcher.Invoke(() => UpdateUi(years, transactions));
+		UpdateUi(years, transactions);
 	}
 
 	private void UpdateUi(List<string> years, List<Transaction> transactions)
 	{
-		Years = new ObservableCollection<string>(years);
-		Transactions = new ObservableCollection<Transaction>(transactions);
-		InitializeSelectedItems();
+		Application.Current.Dispatcher.InvokeAsync(() =>
+		{
+			Years = new ObservableCollection<string>(years);
+			Transactions = new ObservableCollection<Transaction>(transactions);
+			FilteredTransactions = new ObservableCollection<Transaction>(transactions);
+			InitializeSelectedItems();
+		});
 	}
 
 	private void InitializeSelectedItems()
@@ -116,6 +142,29 @@ public class DatabaseViewModel : BaseViewModel
 		SelectedYears?.Clear();
 
 		for (var i = 0; i < Years?.Count; i++) SelectedYears?.Add(i);
+	}
+
+	private void ApplyFilters()
+	{
+		if (Transactions == null || SelectedYears == null)
+		{
+			FilteredTransactions = Transactions;
+			return;
+		}
+
+		var selectedYears = SelectedYears.Select(index => Years[index]).ToList();
+
+		var filteredTransactions = Transactions
+			.Where(transaction =>
+				selectedYears.Contains(transaction.Date.Year.ToString()) &&
+				(string.IsNullOrEmpty(SearchText) ||
+				 transaction.Date.ToString().ToLower().Contains(SearchText) ||
+				 transaction.Type.ToLower().Contains(SearchText) ||
+				 transaction.Amount.ToString().ToLower().Contains(SearchText) ||
+				 transaction.Category.ToLower().Contains(SearchText)))
+			.ToList();
+
+		FilteredTransactions = new ObservableCollection<Transaction>(filteredTransactions);
 	}
 
 	private void OnPreviewMouseLeftButtonDown(object parameter)
@@ -161,10 +210,11 @@ public class DatabaseViewModel : BaseViewModel
 		IsSelecting = false;
 		if (!MouseMoved)
 		{
-			UpdateSelection(listBox, new Rect(), true);
+			UpdateSelection(listBox, new Rect(), true);	
 		}
 		MouseMoved = false;
 
+		ApplyFilters();
 	}
 
 	private void UpdateSelection(ListBox listBox, Rect selectionRect, bool isSimpleClick = false)
@@ -174,7 +224,7 @@ public class DatabaseViewModel : BaseViewModel
 		if (isSimpleClick)
 		{
 			var selectedIndex = listBox.SelectedIndex;
-			if (selectedIndex == -1) return; // Проверяем, что выбран действительный элемент
+			if (selectedIndex == -1) return;
 
 			targetCollection.Clear();
 			targetCollection.Add(selectedIndex);

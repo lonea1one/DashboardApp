@@ -72,6 +72,7 @@
                         </Border>
 
                         <StackPanel>
+
                             <RadioButton
                                 Margin="0,40,0,5"
                                 Command="{Binding UpdateViewCommand}"
@@ -100,6 +101,13 @@
                                 CommandParameter="Settings"
                                 Style="{DynamicResource MenuRadioButtonStyle}"
                                 Tag="{DynamicResource Settings}" />
+
+                            <RadioButton
+                                x:Name="Logout"
+                                Margin="0,360,0,5"
+                                VerticalAlignment="Bottom"
+                                Style="{DynamicResource MenuRadioButtonStyle}"
+                                Tag="{DynamicResource Logout}" />
 
                         </StackPanel>
                     </DockPanel>

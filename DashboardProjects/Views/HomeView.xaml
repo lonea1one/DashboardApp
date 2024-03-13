@@ -11,7 +11,7 @@
     xmlns:vm="clr-namespace:DashboardProjects.ViewModels"
     d:DesignHeight="800"
     d:DesignWidth="1300"
-    FontFamily="#Oswald Regular"
+    FontFamily="/Assets/Fonts/#Oswald Regular"
     mc:Ignorable="d">
 
     <UserControl.DataContext>
@@ -141,7 +141,7 @@
                                     VerticalAlignment="Center">
 
                                     <TextBlock
-                                        FontSize="12"
+                                        FontSize="13"
                                         Foreground="#01A4F6"
                                         Text="{Binding TotalBalance}" />
                                 </Grid>
@@ -198,7 +198,7 @@
                                     VerticalAlignment="Center">
 
                                     <TextBlock
-                                        FontSize="12"
+                                        FontSize="13"
                                         Foreground="#4EF06D"
                                         Text="{Binding TotalIncomeSum}" />
                                 </Grid>
@@ -255,7 +255,7 @@
                                     VerticalAlignment="Center">
 
                                     <TextBlock
-                                        FontSize="12"
+                                        FontSize="13"
                                         Foreground="#FF3E58"
                                         Text="{Binding TotalExpenseSum}" />
                                 </Grid>

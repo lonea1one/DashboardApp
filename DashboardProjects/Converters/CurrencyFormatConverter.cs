@@ -9,12 +9,7 @@ namespace DashboardProjects.Converters
 		{
 			if (value is string stringValue && decimal.TryParse(stringValue, out var number))
 			{
-				if (number == 0)
-				{
-					return "-";
-				}
-
-				return $"{number:N0} ₽";
+				return number == 0 ? "-" : $"{number:N0} ₽";
 			}
 
 			return value; // Возвращаем исходное значение, если преобразование невозможно

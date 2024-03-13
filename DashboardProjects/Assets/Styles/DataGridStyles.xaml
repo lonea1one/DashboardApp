@@ -66,7 +66,9 @@
                                 SelectiveScrollingGrid.SelectiveScrollingOrientation="{Binding AreRowDetailsFrozen, ConverterParameter={x:Static SelectiveScrollingOrientation.Vertical}, Converter={x:Static DataGrid.RowDetailsScrollingConverter}, RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}}"
                                 Visibility="{TemplateBinding DetailsVisibility}" />
                             <DataGridRowHeader
+                                Grid.Row="0"
                                 Grid.RowSpan="2"
+                                Grid.Column="0"
                                 SelectiveScrollingGrid.SelectiveScrollingOrientation="Vertical"
                                 Visibility="{Binding HeadersVisibility, ConverterParameter={x:Static DataGridHeadersVisibility.Row}, Converter={x:Static DataGrid.HeadersVisibilityConverter}, RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}}" />
                         </SelectiveScrollingGrid>
@@ -311,6 +313,102 @@
                 <Setter Property="ScrollViewer.CanContentScroll" Value="false" />
             </MultiTrigger>
         </Style.Triggers>
+    </Style>
+
+    <Style x:Key="ScrollThumbs" TargetType="{x:Type Thumb}">
+        <Setter Property="Background" Value="#D9D9D9" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Thumb}">
+                    <Grid x:Name="Grid">
+                        <Rectangle
+                            Name="Rectangle"
+                            Width="8"
+                            Height="auto"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Stretch"
+                            Fill="{TemplateBinding Background}"
+                            RadiusX="5"
+                            RadiusY="5" />
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="ScrollButtons" TargetType="{x:Type RepeatButton}">
+        <Setter Property="Background" Value="#22272e" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type RepeatButton}">
+                    <Border
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="MyScrollBar" TargetType="{x:Type ScrollBar}">
+        <Setter Property="Background" Value="#22272e" />
+        <Setter Property="Width" Value="12" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ScrollBar}">
+                    <Grid
+                        x:Name="GridRoot"
+                        Width="{DynamicResource {x:Static SystemParameters.VerticalScrollBarWidth}}"
+                        Background="{TemplateBinding Background}">
+                        <Grid.RowDefinitions>
+                            <RowDefinition MaxHeight="18" />
+                            <RowDefinition Height="0.00001*" />
+                            <RowDefinition MaxHeight="18" />
+                        </Grid.RowDefinitions>
+
+                        <RepeatButton
+                            x:Name="DecreaseRepeat"
+                            Command="ScrollBar.LineUpCommand"
+                            Style="{DynamicResource ScrollButtons}">
+                            <Path
+                                x:Name="DecreaseArrow"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Data="F1 M 3.5,0L 0,7L 7,7L 3.5,0 Z"
+                                Fill="#D9D9D9" />
+                        </RepeatButton>
+
+                        <Track
+                            x:Name="PART_Track"
+                            Grid.Row="1"
+                            Cursor="Arrow"
+                            Focusable="False"
+                            IsDirectionReversed="True">
+                            <Track.Thumb>
+                                <Thumb x:Name="Thumb" Style="{DynamicResource ScrollThumbs}" />
+                            </Track.Thumb>
+                        </Track>
+
+                        <RepeatButton
+                            x:Name="IncreaseRepeat"
+                            Grid.Row="2"
+                            Command="ScrollBar.LineDownCommand"
+                            Style="{DynamicResource ScrollButtons}">
+                            <Path
+                                x:Name="IncreaseArrow"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Data="F1 M 3.5,7L 7,0L 0,0L 3.5,7 Z"
+                                Fill="#D9D9D9" />
+                        </RepeatButton>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
 
 </ResourceDictionary>

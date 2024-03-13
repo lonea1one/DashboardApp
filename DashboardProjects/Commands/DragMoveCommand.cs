@@ -15,7 +15,11 @@ public class DragMoveCommand : ICommand
     public void Execute(object parameter)
     {
         if (parameter is not MouseButtonEventArgs args || args.OriginalSource is not FrameworkElement element) return;
-        var window = Window.GetWindow(element);
+
+		if (args.ChangedButton != MouseButton.Left)
+			return;
+
+		var window = Window.GetWindow(element);
 
         window?.DragMove();
     }
