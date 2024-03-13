@@ -4,8 +4,8 @@ using System.Windows;
 
 namespace DashboardProjects
 {
-    public partial class App : Application
-	{
+    public partial class App
+    {
 		private void Application_Startup(object sender, StartupEventArgs e)
 		{
 			try

@@ -3,11 +3,15 @@ using System.Windows.Data;
 
 namespace DashboardProjects.Converters
 {
-	public class BooleanToOpacityConverter : IValueConverter
+	internal class DateDataGridConverter : IValueConverter
 	{
 		public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
 		{
-			return (bool)value ? 1.0 : .5; // Полная видимость или полупрозрачность
+			if (value is DateTime dateTime)
+			{
+				return dateTime.ToString("dd.MM.yyyy");
+			}
+			return value;
 		}
 
 		public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
