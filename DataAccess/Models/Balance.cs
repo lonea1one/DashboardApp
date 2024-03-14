@@ -9,18 +9,12 @@ public class Balance
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; init; }
 
-    public int Month { get; set; }
+    public int Month { get; init; }
 
-    public int Year { get; set; }
+    public int Year { get; init; }
 
     public decimal BalanceAmount { get; set; }
 
-	[NotMapped] // Указывает, что это свойство не должно быть отображено в колонку базы данных
-	public string MonthName
-	{
-		get
-		{
-			return System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(Month);
-		}
-	}
+	[NotMapped]
+	public string MonthName => System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(Month);
 }

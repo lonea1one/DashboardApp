@@ -16,7 +16,11 @@
   <ItemGroup>
     <PackageReference Include="LiveCharts.Wpf.NetCore3" Version="0.9.8" />
     <PackageReference Include="MaterialDesignThemes" Version="5.0.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.3" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.3">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.77" />
   </ItemGroup>
 
@@ -25,9 +29,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="Assets\Fonts\ISOCPEUR.ttf">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </Resource>
     <Resource Include="Assets\Fonts\Oswald-Regular.ttf" />
     <None Remove="Assets\Images\man.png" />
     <Resource Include="Assets\Images\man.png">

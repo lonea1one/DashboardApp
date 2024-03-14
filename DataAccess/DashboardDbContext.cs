@@ -13,12 +13,37 @@ public sealed class DashboardDbContext : DbContext
         // Задаем строку подключения к базе данных
         optionsBuilder.UseSqlServer("Server=localhost;Database=Dashboard;Trusted_Connection=True;TrustServerCertificate=True");
     }
+    
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+	    modelBuilder.Entity<Transaction>()
+		    .HasIndex(t => t.Date);
+
+	    modelBuilder.Entity<Transaction>()
+		    .HasIndex(t => t.Type); 
+
+	    modelBuilder.Entity<Transaction>()
+		    .HasIndex(t => t.Amount); 
+
+	    modelBuilder.Entity<Transaction>()
+		    .HasIndex(t => t.Category); 
+
+		modelBuilder.Entity<Balance>()
+			.HasIndex(t => t.Month); 
+
+		modelBuilder.Entity<Balance>()
+			.HasIndex(t => t.Year); 
+
+		modelBuilder.Entity<Balance>()
+			.HasIndex(t => t.BalanceAmount); 
+
+	}
 
 	public async Task SeedDataAsync()
 	{
 		if (await Database.CanConnectAsync())
 		{
-			if (!(await Transactions.AnyAsync())) // Используем AnyAsync для асинхронной проверки
+			if (!(await Transactions.AnyAsync())) 
 			{
 				var data = await ReadExcelDataAsync(@"Files/dashboard.xlsx");
 				Transactions.AddRange(data); 

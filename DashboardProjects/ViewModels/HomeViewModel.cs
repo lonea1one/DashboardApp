@@ -1113,10 +1113,10 @@ public class HomeViewModel : BaseViewModel
 
 		// Определение шаблона меток с кастомным отступом
 		var dataTemplate = new DataTemplate();
-
+		
 		var textBlockFactory = new FrameworkElementFactory(typeof(TextBlock));
 		textBlockFactory.SetBinding(TextBlock.TextProperty, new Binding("Point.Y") { StringFormat = "N0", ConverterCulture = new CultureInfo("ru-RU") });
-		textBlockFactory.SetValue(TextBlock.FontFamilyProperty, new FontFamily("Oswald Regular"));
+		textBlockFactory.SetValue(TextBlock.FontFamilyProperty, new FontFamily(new Uri("pack://application:,,,/"), "/Assets/Fonts/#Oswald Regular"));
 		textBlockFactory.SetValue(TextBlock.MarginProperty, new Thickness(0, 0, 0, 10));
 		textBlockFactory.SetValue(TextBlock.HorizontalAlignmentProperty, HorizontalAlignment.Center);
 

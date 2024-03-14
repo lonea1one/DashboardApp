@@ -144,7 +144,7 @@ public class DatabaseViewModel : BaseViewModel
 		for (var i = 0; i < Years?.Count; i++) SelectedYears?.Add(i);
 	}
 
-	private void ApplyFilters()
+	private async void ApplyFilters()
 	{
 		if (Transactions == null || SelectedYears == null)
 		{
@@ -153,16 +153,20 @@ public class DatabaseViewModel : BaseViewModel
 		}
 
 		var selectedYears = SelectedYears.Select(index => Years[index]).ToList();
-
-		var filteredTransactions = Transactions
-			.Where(transaction =>
-				selectedYears.Contains(transaction.Date.Year.ToString()) &&
-				(string.IsNullOrEmpty(SearchText) ||
-				 transaction.Date.ToString().ToLower().Contains(SearchText) ||
-				 transaction.Type.ToLower().Contains(SearchText) ||
-				 transaction.Amount.ToString().ToLower().Contains(SearchText) ||
-				 transaction.Category.ToLower().Contains(SearchText)))
-			.ToList();
+		var searchTextLower = SearchText?.ToLower();
+		
+		var filteredTransactions = await Task.Run(() =>
+		{
+			return Transactions
+				.Where(transaction =>
+					selectedYears.Contains(transaction.Date.Year.ToString()) &&
+					(string.IsNullOrEmpty(SearchText) ||
+					 transaction.Date.ToString().ToLower().Contains(searchTextLower) ||
+					 transaction.Type.ToLower().Contains(searchTextLower) ||
+					 transaction.Amount.ToString().ToLower().Contains(searchTextLower) ||
+					 transaction.Category.ToLower().StartsWith(searchTextLower)))
+				.ToList();
+		});
 
 		FilteredTransactions = new ObservableCollection<Transaction>(filteredTransactions);
 	}
