@@ -138,10 +138,12 @@
             </Grid>
         </Grid>
 
-        <Grid Grid.Row="1">
+        <Grid Grid.Row="1"
+              Margin="30">
             <DataGrid
                 MinHeight="100"
-                Margin="40,20,40,20"
+                MaxHeight="792"
+                Margin="0 0 0 56"
                 VerticalAlignment="Top"
                 CellStyle="{DynamicResource DataGridCellStyle}"
                 ColumnHeaderStyle="{DynamicResource DataGridColumnHeaderStyle}"
@@ -154,22 +156,22 @@
 
                 <DataGrid.Columns>
                     <DataGridTextColumn
-                        Width="150"
+                        Width="1*"
                         Binding="{Binding Date, Converter={StaticResource DateConverter}}"
                         Header="DATE" />
 
                     <DataGridTextColumn
-                        Width="250"
+                        Width="2*"
                         Binding="{Binding Type}"
                         Header="TRANSACTION" />
 
                     <DataGridTextColumn
-                        Width="360"
+                        Width="2.5*"
                         Binding="{Binding Amount, Converter={StaticResource AmountConverter}}"
                         Header="AMOUNT" />
 
                     <DataGridTextColumn
-                        Width="455"
+                        Width="4*"
                         Binding="{Binding Category}"
                         Header="CATEGORY" />
                 </DataGrid.Columns>

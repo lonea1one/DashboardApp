@@ -164,7 +164,7 @@ public class DatabaseViewModel : BaseViewModel
 					 transaction.Date.ToString().ToLower().Contains(searchTextLower) ||
 					 transaction.Type.ToLower().Contains(searchTextLower) ||
 					 transaction.Amount.ToString().ToLower().Contains(searchTextLower) ||
-					 transaction.Category.ToLower().StartsWith(searchTextLower)))
+					 transaction.Category.ToLower().Contains(searchTextLower)))
 				.ToList();
 		});
 
