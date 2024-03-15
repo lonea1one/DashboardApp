@@ -1,6 +1,7 @@
 ﻿using ClosedXML.Excel;
 using DataAccess.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace DataAccess;
 public sealed class DashboardDbContext : DbContext
@@ -10,8 +11,12 @@ public sealed class DashboardDbContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        // Задаем строку подключения к базе данных
-        optionsBuilder.UseSqlServer("Server=localhost;Database=Dashboard;Trusted_Connection=True;TrustServerCertificate=True");
+	    var config = new ConfigurationBuilder()
+		    .AddJsonFile("appsettings.json")
+		    .SetBasePath(Directory.GetCurrentDirectory())
+		    .Build();
+	    
+        optionsBuilder.UseSqlServer(config.GetConnectionString("DefaultConnection"));
     }
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
