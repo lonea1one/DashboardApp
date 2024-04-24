@@ -1,0 +1,195 @@
+<Window
+    x:Class="DashboardProjects.Views.AddTransactionView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:local="clr-namespace:DashboardProjects.Controls"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="clr-namespace:DashboardProjects.ViewModels"
+    x:Name="AddTransactionWindow"
+    Title="Добавить транзацкию"
+    Width="800"
+    Height="650"
+    FontFamily="/Assets/Fonts/#Oswald Regular"
+    mc:Ignorable="d">
+
+    <Window.DataContext>
+        <vm:AddTransactionViewModel />
+    </Window.DataContext>
+
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <materialDesign:BundledTheme
+                    BaseTheme="Dark"
+                    PrimaryColor="LightBlue"
+                    SecondaryColor="Green" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesign3.Defaults.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesign2.Defaults.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <Grid Background="#25292E">
+        <StackPanel Margin="50">
+            <StackPanel Orientation="Horizontal">
+                <DatePicker
+                    Width="350"
+                    HorizontalAlignment="Left"
+                    materialDesign:DatePickerAssist.OutlinedBorderActiveThickness="1"
+                    materialDesign:DatePickerAssist.OutlinedBorderInactiveThickness="2"
+                    materialDesign:HintAssist.Background="{x:Null}"
+                    materialDesign:HintAssist.Foreground="#9299A2"
+                    materialDesign:HintAssist.Hint="Введите дату"
+                    materialDesign:TextFieldAssist.HasClearButton="True"
+                    BorderBrush="#323338"
+                    Focusable="False"
+                    FontSize="20"
+                    Foreground="#EAEAEA"
+                    SelectedDate="{Binding SelectedDate}"
+                    SelectedDateFormat="Short"
+                    Style="{StaticResource MaterialDesignOutlinedDatePicker}" />
+
+                <Grid Visibility="{Binding DateErrorVisibility}">
+                    <local:PopupUserControl />
+                    <TextBlock
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Panel.ZIndex="1"
+                        FontSize="15"
+                        Foreground="#EAEAEA"
+                        Text="{Binding DateErrorMessage}" />
+                </Grid>
+            </StackPanel>
+
+            <StackPanel Margin="0,20,0,0" Orientation="Horizontal">
+                <ComboBox
+                    Width="350"
+                    HorizontalAlignment="Left"
+                    materialDesign:HintAssist.Background="{x:Null}"
+                    materialDesign:HintAssist.Foreground="#9299A2"
+                    materialDesign:HintAssist.Hint="Категория"
+                    materialDesign:TextFieldAssist.HasClearButton="True"
+                    BorderBrush="#323338"
+                    BorderThickness="1"
+                    FontSize="20"
+                    Foreground="#EAEAEA"
+                    ItemsSource="{Binding Categories}"
+                    SelectedItem="{Binding SelectedCategory}"
+                    Style="{StaticResource MaterialDesignOutlinedComboBox}">
+
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="SelectionChanged">
+                            <i:InvokeCommandAction Command="{Binding CategorySelectionChangedCommand}" PassEventArgsToCommand="True" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </ComboBox>
+
+                <Grid Visibility="{Binding TransactionErrorVisibility}">
+                    <local:PopupUserControl />
+                    <TextBlock
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Panel.ZIndex="1"
+                        FontSize="15"
+                        Foreground="#EAEAEA"
+                        Text="{Binding TransactionErrorMessage}" />
+                </Grid>
+            </StackPanel>
+
+            <StackPanel Margin="0,20,0,0" Orientation="Horizontal">
+                <ComboBox
+                    Width="350"
+                    HorizontalAlignment="Left"
+                    materialDesign:HintAssist.Background="{x:Null}"
+                    materialDesign:HintAssist.Foreground="#9299A2"
+                    materialDesign:HintAssist.Hint="Транзакция"
+                    materialDesign:TextFieldAssist.HasClearButton="True"
+                    BorderBrush="#323338"
+                    BorderThickness="1"
+                    FontSize="20"
+                    Foreground="#EAEAEA"
+                    ItemsSource="{Binding Types}"
+                    SelectedItem="{Binding SelectedType}"
+                    Style="{StaticResource MaterialDesignOutlinedComboBox}" />
+
+                <Grid Visibility="{Binding TypeErrorVisibility}">
+                    <local:PopupUserControl />
+                    <TextBlock
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Panel.ZIndex="1"
+                        FontSize="15"
+                        Foreground="#EAEAEA"
+                        Text="{Binding TypeErrorMessage}" />
+                </Grid>
+            </StackPanel>
+
+            <StackPanel Margin="0,20,0,0" Orientation="Horizontal">
+                <TextBox
+                    Width="350"
+                    HorizontalAlignment="Left"
+                    materialDesign:HintAssist.Background="{x:Null}"
+                    materialDesign:HintAssist.Foreground="#9299A2"
+                    materialDesign:HintAssist.HelperText=""
+                    materialDesign:HintAssist.Hint="Сумма"
+                    Background="Transparent"
+                    BorderBrush="#323338"
+                    BorderThickness="1"
+                    CaretBrush="#fcfefe"
+                    FontSize="20"
+                    Foreground="#EAEAEA"
+                    Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                    Text="{Binding Amount, TargetNullValue=''}">
+
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="PreviewTextInput">
+                            <i:InvokeCommandAction Command="{Binding TextInputCommand}" PassEventArgsToCommand="True" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+
+                </TextBox>
+
+                <Grid Visibility="{Binding AmountErrorVisibility}">
+                    <local:PopupUserControl />
+                    <TextBlock
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Panel.ZIndex="1"
+                        FontSize="15"
+                        Foreground="#EAEAEA"
+                        Text="{Binding AmountErrorMessage}" />
+                </Grid>
+            </StackPanel>
+
+            <StackPanel
+                Margin="0,100,0,0"
+                HorizontalAlignment="Center"
+                Orientation="Horizontal">
+
+                <Button
+                    Width="150"
+                    Height="50"
+                    Margin="5"
+                    Command="{Binding AddDataCommand}"
+                    Content="Accept"
+                    Style="{StaticResource RoundButton}"
+                    Tag="{StaticResource AcceptIcon}" />
+
+                <Button
+                    Width="150"
+                    Height="50"
+                    Margin="5"
+                    Command="{Binding CloseWindowCommand, Mode=OneWay}"
+                    CommandParameter="{Binding ElementName=AddTransactionWindow}"
+                    Content="Cancel"
+                    Style="{StaticResource RoundButton}"
+                    Tag="{StaticResource CancelIcon}" />
+
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</Window>
+

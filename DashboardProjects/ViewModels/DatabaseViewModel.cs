@@ -6,6 +6,8 @@ using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using DashboardProjects.Utils;
+using DashboardProjects.Views;
 
 namespace DashboardProjects.ViewModels;
 
@@ -45,6 +47,19 @@ public class DatabaseViewModel : BaseViewModel
 		}
 	}
 
+	private Transaction _selectedTransaction;
+	public Transaction SelectedTransaction
+	{
+		get => _selectedTransaction;
+		set
+		{
+			_selectedTransaction = value;
+			OnPropertyChanged(nameof(SelectedTransaction));
+			IsEditEnabled = _selectedTransaction != null;
+			IsDeleteEnabled = _selectedTransaction != null;
+		}
+	}
+
 	private ObservableCollection<Transaction> _filteredTransactions;
 	public ObservableCollection<Transaction> FilteredTransactions
 	{
@@ -59,6 +74,31 @@ public class DatabaseViewModel : BaseViewModel
 	public ICommand LbMouseLeftButtonDownCommand { get; private set; }
 	public ICommand LbMouseMoveCommand { get; private set; }
 	public ICommand LbMouseLeftButtonUpCommand { get; private set; }
+	public ICommand AddNewItemWindowCommand { get; }
+	public ICommand DeleteCommand { get; }
+	public ICommand EditCommand { get; }
+
+	private bool _isEditEnabled;
+	public bool IsEditEnabled
+	{
+		get => _isEditEnabled;
+		set
+		{
+			_isEditEnabled = value;
+			OnPropertyChanged(nameof(IsEditEnabled));
+		}
+	}
+
+	private bool _isDeleteEnabled;
+	public bool IsDeleteEnabled
+	{
+		get => _isDeleteEnabled;
+		set
+		{
+			_isDeleteEnabled = value;
+			OnPropertyChanged(nameof(IsDeleteEnabled));
+		}
+	}
 
 	private Point _startPoint;
 	public Point StartPoint
@@ -104,16 +144,23 @@ public class DatabaseViewModel : BaseViewModel
 			ApplyFilters();
 		}
 	}
+
 	public DatabaseViewModel()
 	{
-		Years = new ObservableCollection<string>();
-		SelectedYears = new ObservableCollection<int>();
+		Years = [];
+		SelectedYears = [];
 
 		LbMouseLeftButtonDownCommand = new RelayCommand<MouseButtonEventArgs>(OnPreviewMouseLeftButtonDown);
 		LbMouseMoveCommand = new RelayCommand<MouseEventArgs>(OnPreviewMouseMove);
 		LbMouseLeftButtonUpCommand = new RelayCommand<MouseButtonEventArgs>(OnPreviewMouseLeftButtonUp);
 
+		EditCommand = new RelayCommand(EditTransaction);
+		DeleteCommand = new RelayCommand(DeleteTransaction);
+		AddNewItemWindowCommand = new RelayCommand(OnOpenAddNewItemWindowCommand);
+
 		_ = LoadDataAsync();
+
+		EventMediator.TransactionAdded += OnTransactionAdded;
 	}
 
 	private async Task LoadDataAsync()
@@ -124,6 +171,12 @@ public class DatabaseViewModel : BaseViewModel
 		var years = await context.Transactions.Select(m => m.Date.Year.ToString()).Distinct().ToListAsync();
 
 		UpdateUi(years, transactions);
+	}
+
+	private void OnTransactionAdded(object sender, EventArgs e)
+	{
+		_ = LoadDataAsync();
+		ApplyFilters();
 	}
 
 	private void UpdateUi(List<string> years, List<Transaction> transactions)
@@ -219,6 +272,57 @@ public class DatabaseViewModel : BaseViewModel
 		MouseMoved = false;
 
 		ApplyFilters();
+	}
+
+	private static void OnOpenAddNewItemWindowCommand(object parameter)
+	{
+		AddTransactionView addTransactionView = new();
+		addTransactionView.Show();
+	}
+
+	private void EditTransaction(object parameter)
+	{
+		if (parameter != null)
+		{
+			SelectedTransaction = (Transaction)parameter;
+			IsEditEnabled = true;
+		}
+
+		if (SelectedTransaction == null) return;
+		using (var context = new DashboardDbContext())
+		{
+			var existingTransaction = context.Transactions.Find(SelectedTransaction.Id);
+			if (existingTransaction != null)
+			{
+				existingTransaction.Date = SelectedTransaction.Date;
+				existingTransaction.Category = SelectedTransaction.Category;
+				existingTransaction.Amount = SelectedTransaction.Amount;
+				existingTransaction.Type = SelectedTransaction.Type;
+
+				context.SaveChanges();
+			}
+		}
+
+		_ = LoadDataAsync();
+	}
+
+	private void DeleteTransaction(object parameter)
+	{
+		if (SelectedTransaction == null) return;
+		var confirmation = MessageBox.Show("Вы уверены что хотите удалить выделенную транзакцию?", "Удалить транзакцию", MessageBoxButton.YesNo, MessageBoxImage.Question);
+
+		if (confirmation != MessageBoxResult.Yes) return;
+		using (var context = new DashboardDbContext())
+		{
+			var existingTransaction = context.Transactions.Find(SelectedTransaction.Id);
+			if (existingTransaction != null)
+			{
+				context.Transactions.Remove(existingTransaction);
+				context.SaveChanges();
+			}
+		}
+
+		_ = LoadDataAsync();
 	}
 
 	private void UpdateSelection(ListBox listBox, Rect selectionRect, bool isSimpleClick = false)

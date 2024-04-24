@@ -149,7 +149,7 @@
         <Setter Property="Height" Value="40" />
         <Setter Property="BorderBrush" Value="#444c56" />
         <Setter Property="VerticalAlignment" Value="Center" />
-        <Setter Property="FontFamily" Value="/Assets/Fonts/#Oswald Regular"/>
+        <Setter Property="FontFamily" Value="/Assets/Fonts/#Oswald Regular" />
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="Template">
             <Setter.Value>
@@ -226,7 +226,6 @@
         <Setter Property="GridLinesVisibility" Value="None" />
         <Setter Property="SelectionMode" Value="Single" />
         <Setter Property="SelectionUnit" Value="FullRow" />
-        <Setter Property="IsReadOnly" Value="True" />
         <Setter Property="CanUserAddRows" Value="False" />
         <Setter Property="CanUserDeleteRows" Value="False" />
         <Setter Property="CanUserResizeRows" Value="False" />

@@ -22,7 +22,7 @@ namespace DashboardProjects
 				// Логирование ошибки
 				Debug.WriteLine("Не удалось инициализировать базу данных: " + ex.Message);
 				// Показать сообщение пользователю
-				MessageBox.Show("Произошла ошибка при инициализации базы данных.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+				MessageBox.Show($"{ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
 				// Завершить работу приложения
 				Current.Shutdown();
 			}

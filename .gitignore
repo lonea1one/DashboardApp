@@ -8,3 +8,7 @@
 /.vs/DashboardProjects/v17/.suo
 /.vs/ProjectEvaluation/dashboardprojects.metadata.v7.bin
 /.vs/ProjectEvaluation/dashboardprojects.projects.v7.bin
+.idea
+.vs
+DashboardProjects/bin
+DashboardProjects/obj

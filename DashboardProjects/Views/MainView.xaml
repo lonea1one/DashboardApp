@@ -101,16 +101,16 @@
                                 CommandParameter="Settings"
                                 Style="{DynamicResource MenuRadioButtonStyle}"
                                 Tag="{DynamicResource Settings}" />
-                            
+
+                            <RadioButton
+                                x:Name="Logout"
+                                Margin="0,360,0,5"
+                                VerticalAlignment="Bottom"
+                                Style="{DynamicResource MenuRadioButtonStyle}"
+                                Tag="{DynamicResource Logout}" />
+
                         </StackPanel>
                     </DockPanel>
-                    
-                    <RadioButton
-                        x:Name="Logout"
-                        Margin="0,360,0,5"
-                        VerticalAlignment="Bottom"
-                        Style="{DynamicResource LogoutButtonStyle}"
-                        Tag="{DynamicResource Logout}" />
                 </Grid>
             </Border>
 

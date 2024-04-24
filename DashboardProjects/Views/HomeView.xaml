@@ -368,6 +368,7 @@
                             </Grid.RowDefinitions>
 
                             <lvc:PieChart
+                                Name="IncomePieChart"
                                 Width="140"
                                 Height="140"
                                 Margin="0,0,0,10"
@@ -895,6 +896,7 @@
 
                 <Grid Grid.Row="1">
                     <lvc:CartesianChart
+                        Name="BalanceChart"
                         Margin="10"
                         Series="{Binding BalanceChartSeries}">
 

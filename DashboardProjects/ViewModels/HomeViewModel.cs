@@ -653,8 +653,8 @@ public class HomeViewModel : BaseViewModel
 			{
 				Year = g.Key.Year,
 				Quarter = g.Key.Quarter,
-				TotalIncome = g.Where(t => t.Type == "ДОХОДЫ").Sum(t => t.Amount),
-				TotalExpense = g.Where(t => t.Type == "РАСХОДЫ").Sum(t => t.Amount)
+				TotalIncome = g.Where(t => t.Type == "ДОХОДЫ").Sum(t => (double)t.Amount),
+				TotalExpense = g.Where(t => t.Type == "РАСХОДЫ").Sum(t => (double)t.Amount)
 			})
 			.ToList();
 
@@ -765,10 +765,10 @@ public class HomeViewModel : BaseViewModel
 		var categories = await context.Transactions
 			.Where(x => x.Type == type)
 			.GroupBy(t => t.Category)
-			.Select(g => new { Category = g.Key, Sum = g.Sum(t => t.Amount) })
+			.Select(g => new { Category = g.Key, Sum = g.Sum(t => (double)t.Amount) })
 			.ToListAsync();
 
-		return categories.Select(item => (item.Category, item.Sum)).ToList();
+		return categories.Select(item => (item.Category, (decimal)item.Sum)).ToList();
 	}
 
 	private static List<Brush> GetExpenseChartColors()
@@ -849,8 +849,8 @@ public class HomeViewModel : BaseViewModel
 			.GroupBy(t => new { Year = t.Date.Year, Month = t.Date.Month })
 			.Select(group =>
 			{
-				var totalAmount = group.Sum(t => t.Amount);
-				var yearTotal = transactions.Where(t => t.Date.Year == group.Key.Year).Sum(t => t.Amount);
+				var totalAmount = (decimal)group.Sum(t => (double)t.Amount);
+				var yearTotal = (decimal)transactions.Where(t => t.Date.Year == group.Key.Year).Sum(t => (double)t.Amount);
 
 				return new
 				{
@@ -959,7 +959,7 @@ public class HomeViewModel : BaseViewModel
 
 	private void UpdateLabelsAndFormatters(List<(DateTime Month, decimal TotalAmount, decimal Percentage)> chartData, string transactionType)
 	{
-		var labels = chartData.Select(x => x.Month.ToString("MMM").ToUpper().Substring(0, 3)).ToArray();
+		var labels = chartData.Select(x => x.Month.ToString("MMM").ToUpper()[..3]).ToArray();
 		var yFormatter = new Func<double, string>(value => value.ToString("N0"));
 
 		if (transactionType == "ДОХОДЫ")
@@ -1113,10 +1113,10 @@ public class HomeViewModel : BaseViewModel
 
 		// Определение шаблона меток с кастомным отступом
 		var dataTemplate = new DataTemplate();
-		
+
 		var textBlockFactory = new FrameworkElementFactory(typeof(TextBlock));
 		textBlockFactory.SetBinding(TextBlock.TextProperty, new Binding("Point.Y") { StringFormat = "N0", ConverterCulture = new CultureInfo("ru-RU") });
-		textBlockFactory.SetValue(TextBlock.FontFamilyProperty, new FontFamily(new Uri("pack://application:,,,/"), "/Assets/Fonts/#Oswald Regular"));
+		textBlockFactory.SetValue(TextBlock.FontFamilyProperty, new FontFamily("Oswald Regular"));
 		textBlockFactory.SetValue(TextBlock.MarginProperty, new Thickness(0, 0, 0, 10));
 		textBlockFactory.SetValue(TextBlock.HorizontalAlignmentProperty, HorizontalAlignment.Center);
 
@@ -1140,7 +1140,7 @@ public class HomeViewModel : BaseViewModel
 			series.Values.Add(item.Balance);
 		}
 
-		BalanceLabels = balanceData.Select(x => x.Month.ToUpper().Substring(0, 3)).ToArray();
+		BalanceLabels = balanceData.Select(x => x.Month.ToUpper()[..3]).ToArray();
 		BalanceYFormatter = yFormatter;
 	}
 
@@ -1179,9 +1179,9 @@ public class HomeViewModel : BaseViewModel
 		}
 		
 		// Получение общей суммы по выбранным годам для заданного типа транзакции
-		var totalSum = context.Transactions
+		var totalSum = (decimal)context.Transactions
 			.Where(t => t.Type == transactionType)
-			.Sum(t => t.Amount);
+			.Sum(t => (double)t.Amount);
 
 		Application.Current.Dispatcher.Invoke(() =>
 		{
@@ -1200,9 +1200,9 @@ public class HomeViewModel : BaseViewModel
 			{
 				var series = (PieSeries)seriesView;
 				// Сумма по категории и выбранным годам
-				var sum = context.Transactions
+				var sum = (decimal)context.Transactions
 					.Where(t => t.Category == series.Title && selectedYears.Contains(t.Date.Year.ToString()) && t.Type == transactionType)
-					.Sum(t => t.Amount);
+					.Sum(t => (double)t.Amount);
 
 				if (selectedCategories.Contains(series.Title))
 				{

@@ -11,44 +11,30 @@ public sealed class DashboardDbContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-	    var config = new ConfigurationBuilder()
-		    .AddJsonFile("appsettings.json")
-		    .SetBasePath(Directory.GetCurrentDirectory())
-		    .Build();
-	    
-        optionsBuilder.UseSqlServer(config.GetConnectionString("DefaultConnection"));
-    }
-    
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
-	    modelBuilder.Entity<Transaction>()
-		    .HasIndex(t => t.Date);
+		var config = new ConfigurationBuilder()
+						.AddJsonFile("appsettings.json")
+						.SetBasePath(Directory.GetCurrentDirectory())
+						.Build();
 
-	    modelBuilder.Entity<Transaction>()
-		    .HasIndex(t => t.Type); 
+		optionsBuilder.UseSqlite(config.GetConnectionString("SQLiteConnection"));
+	}
 
-	    modelBuilder.Entity<Transaction>()
-		    .HasIndex(t => t.Amount); 
+	protected override void OnModelCreating(ModelBuilder modelBuilder)
+	{
+		var transaction = modelBuilder.Entity<Transaction>();
+		var balance = modelBuilder.Entity<Balance>();
 
-	    modelBuilder.Entity<Transaction>()
-		    .HasIndex(t => t.Category); 
-
-		modelBuilder.Entity<Balance>()
-			.HasIndex(t => t.Month); 
-
-		modelBuilder.Entity<Balance>()
-			.HasIndex(t => t.Year); 
-
-		modelBuilder.Entity<Balance>()
-			.HasIndex(t => t.BalanceAmount); 
-
+		transaction.HasIndex(t => t.Date);
+		transaction.HasIndex(t => t.Type);
+		transaction.HasIndex(t => t.Amount);
+		transaction.HasIndex(t => t.Category);
 	}
 
 	public async Task SeedDataAsync()
 	{
 		if (await Database.CanConnectAsync())
 		{
-			if (!(await Transactions.AnyAsync())) 
+			if (!(await Transactions.AnyAsync())) // Используем AnyAsync для асинхронной проверки
 			{
 				var data = await ReadExcelDataAsync(@"Files/dashboard.xlsx");
 				Transactions.AddRange(data); 
@@ -129,11 +115,11 @@ public sealed class DashboardDbContext : DbContext
 			var monthlyTransactions = transactions
 				.Where(t => t.Date >= currentDate && t.Date < nextMonth).ToList();
 
-			var monthlyIncome = monthlyTransactions
-				.Where(t => t.Type == "ДОХОДЫ").Sum(t => t.Amount);
+			var monthlyIncome = (decimal)monthlyTransactions
+				.Where(t => t.Type == "ДОХОДЫ").Sum(t => (double)t.Amount);
 
-			var monthlyExpenses = monthlyTransactions
-				.Where(t => t.Type == "РАСХОДЫ").Sum(t => t.Amount);
+			var monthlyExpenses = (decimal)monthlyTransactions
+				.Where(t => t.Type == "РАСХОДЫ").Sum(t => (double)t.Amount);
 
 			// Рассчитываем баланс за месяц
 			initialBalance += monthlyIncome - monthlyExpenses;
@@ -164,13 +150,13 @@ public sealed class DashboardDbContext : DbContext
 			var nextMonth = currentDate.AddMonths(1);
 
 			// Суммируем доходы и расходы за месяц
-			var monthlyIncome = context.Transactions
+			var monthlyIncome = (decimal)context.Transactions
 				.Where(t => t.Date >= currentDate && t.Date < nextMonth && t.Type == "ДОХОДЫ")
-				.Sum(t => t.Amount);
+				.Sum(t => (double)t.Amount);
 
-			var monthlyExpenses = context.Transactions
+			var monthlyExpenses = (decimal)context.Transactions
 				.Where(t => t.Date >= currentDate && t.Date < nextMonth && t.Type == "РАСХОДЫ")
-				.Sum(t => t.Amount);
+				.Sum(t => (double)t.Amount);
 
 			// Рассчитываем баланс за месяц
 			initialBalance += monthlyIncome - monthlyExpenses;

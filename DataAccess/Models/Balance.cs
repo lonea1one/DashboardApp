@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Data.SqlTypes;
 
 namespace DataAccess.Models;
 
@@ -15,6 +16,6 @@ public class Balance
 
     public decimal BalanceAmount { get; set; }
 
-	[NotMapped]
+	[NotMapped] // ���������, ��� ��� �������� �� ������ ���� ���������� � ������� ���� ������
 	public string MonthName => System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(Month);
 }
