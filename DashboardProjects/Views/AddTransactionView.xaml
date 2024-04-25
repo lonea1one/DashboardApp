@@ -11,7 +11,7 @@
     x:Name="AddTransactionWindow"
     Title="Добавить транзацкию"
     Width="800"
-    Height="650"
+    Height="750"
     FontFamily="/Assets/Fonts/#Oswald Regular"
     mc:Ignorable="d">
 
@@ -115,6 +115,7 @@
                     SelectedItem="{Binding SelectedType}"
                     Style="{StaticResource MaterialDesignOutlinedComboBox}" />
 
+
                 <Grid Visibility="{Binding TypeErrorVisibility}">
                     <local:PopupUserControl />
                     <TextBlock
@@ -124,6 +125,42 @@
                         FontSize="15"
                         Foreground="#EAEAEA"
                         Text="{Binding TypeErrorMessage}" />
+                </Grid>
+            </StackPanel>
+
+            <StackPanel Margin="0,20,0,0" Orientation="Horizontal">
+                <TextBox
+                    Width="350"
+                    HorizontalAlignment="Left"
+                    materialDesign:HintAssist.Background="{x:Null}"
+                    materialDesign:HintAssist.Foreground="#9299A2"
+                    materialDesign:HintAssist.HelperText=""
+                    materialDesign:HintAssist.Hint="Добавить категорию"
+                    Background="Transparent"
+                    BorderBrush="#323338"
+                    BorderThickness="1"
+                    CaretBrush="#fcfefe"
+                    FontSize="20"
+                    Foreground="#EAEAEA"
+                    Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                    Text="{Binding Category}">
+
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="PreviewTextInput">
+                            <i:InvokeCommandAction Command="{Binding CategoryInputCommand}" PassEventArgsToCommand="True" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </TextBox>
+
+                <Grid Visibility="{Binding CategoryErrorVisibility}">
+                    <local:PopupUserControl />
+                    <TextBlock
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Panel.ZIndex="1"
+                        FontSize="15"
+                        Foreground="#EAEAEA"
+                        Text="{Binding CategoryErrorMessage}" />
                 </Grid>
             </StackPanel>
 
@@ -146,7 +183,7 @@
 
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="PreviewTextInput">
-                            <i:InvokeCommandAction Command="{Binding TextInputCommand}" PassEventArgsToCommand="True" />
+                            <i:InvokeCommandAction Command="{Binding AmountInputCommand}" PassEventArgsToCommand="True" />
                         </i:EventTrigger>
                     </i:Interaction.Triggers>
 

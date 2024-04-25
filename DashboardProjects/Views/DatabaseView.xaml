@@ -26,6 +26,7 @@
 
             <local:AmountDataGridConverter x:Key="AmountConverter" />
             <local:DateDataGridConverter x:Key="DateConverter" />
+            <local:TypeDataGridConverter x:Key="TypeConverter" />
         </ResourceDictionary>
     </UserControl.Resources>
 
@@ -45,126 +46,126 @@
             </Grid.ColumnDefinitions>
 
             <Grid Grid.Column="0">
-    <ListBox
-        x:Name="YearLb"
-        Width="100"
-        MinHeight="35"
-        Margin="40,0,0,0"
-        HorizontalAlignment="Left"
-        Background="#2f3438"
-        BorderThickness="0"
-        FontSize="15"
-        ItemsSource="{Binding Years}"
-        SelectionMode="Extended">
+                <ListBox
+                    x:Name="YearLb"
+                    Width="100"
+                    MinHeight="35"
+                    Margin="40,0,0,0"
+                    HorizontalAlignment="Left"
+                    Background="#2f3438"
+                    BorderThickness="0"
+                    FontSize="15"
+                    ItemsSource="{Binding Years}"
+                    SelectionMode="Extended">
 
-        <ListBox.ItemsPanel>
-            <ItemsPanelTemplate>
-                <StackPanel HorizontalAlignment="Center" Orientation="Horizontal" />
-            </ItemsPanelTemplate>
-        </ListBox.ItemsPanel>
+                    <ListBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel HorizontalAlignment="Center" Orientation="Horizontal" />
+                        </ItemsPanelTemplate>
+                    </ListBox.ItemsPanel>
 
-        <i:Interaction.Behaviors>
-            <iv:ListBoxSelectionBehavior SelectedItems="{Binding SelectedYears}" />
-        </i:Interaction.Behaviors>
-        <i:Interaction.Triggers>
-            <i:EventTrigger EventName="PreviewMouseLeftButtonDown">
-                <i:InvokeCommandAction Command="{Binding LbMouseLeftButtonDownCommand}" PassEventArgsToCommand="True" />
-            </i:EventTrigger>
-            <i:EventTrigger EventName="PreviewMouseMove">
-                <i:InvokeCommandAction Command="{Binding LbMouseMoveCommand}" PassEventArgsToCommand="True" />
-            </i:EventTrigger>
-            <i:EventTrigger EventName="PreviewMouseLeftButtonUp">
-                <i:InvokeCommandAction Command="{Binding LbMouseLeftButtonUpCommand}" PassEventArgsToCommand="True" />
-            </i:EventTrigger>
-        </i:Interaction.Triggers>
+                    <i:Interaction.Behaviors>
+                        <iv:ListBoxSelectionBehavior SelectedItems="{Binding SelectedYears}" />
+                    </i:Interaction.Behaviors>
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="PreviewMouseLeftButtonDown">
+                            <i:InvokeCommandAction Command="{Binding LbMouseLeftButtonDownCommand}" PassEventArgsToCommand="True" />
+                        </i:EventTrigger>
+                        <i:EventTrigger EventName="PreviewMouseMove">
+                            <i:InvokeCommandAction Command="{Binding LbMouseMoveCommand}" PassEventArgsToCommand="True" />
+                        </i:EventTrigger>
+                        <i:EventTrigger EventName="PreviewMouseLeftButtonUp">
+                            <i:InvokeCommandAction Command="{Binding LbMouseLeftButtonUpCommand}" PassEventArgsToCommand="True" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
 
-    </ListBox>
-</Grid>
+                </ListBox>
+            </Grid>
 
-<Grid
-    Grid.Column="1"
-    Width="250"
-    Margin="100,0,0,0"
-    HorizontalAlignment="Left">
-
-
-    <Border
-        Height="45"
-        HorizontalAlignment="Stretch"
-        Background="#22272e"
-        CornerRadius="20">
-
-        <Grid Height="Auto">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="60" />
-            </Grid.ColumnDefinitions>
-
-            <TextBox
-                Grid.Column="0"
-                Margin="20,0,0,0"
-                HorizontalAlignment="Stretch"
-                VerticalAlignment="Stretch"
-                VerticalContentAlignment="Center"
-                materialDesign:HintAssist.Foreground="#D9D9D9"
-                materialDesign:HintAssist.Hint="Search..."
-                materialDesign:TextFieldAssist.UnderlineBrush="{x:Null}"
-                Background="Transparent"
-                BorderThickness="0"
-                CaretBrush="#fcfefe"
-                FontSize="16"
-                Foreground="#D9D9D9"
-                Style="{StaticResource MaterialDesignTextBox}"
-                Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
-                TextAlignment="Left" />
-
-            <Ellipse
+            <Grid
                 Grid.Column="1"
-                Width="35"
-                Height="35"
-                Margin="15,0,0,0"
-                Fill="#D9D9D9" />
+                Width="250"
+                Margin="100,0,0,0"
+                HorizontalAlignment="Left">
 
-            <materialDesign:PackIcon
-                Grid.Column="1"
-                Width="25"
-                Height="25"
-                Margin="15,0,0,0"
-                HorizontalAlignment="Center"
-                VerticalAlignment="Center"
-                Foreground="Black"
-                Kind="Search" />
-        </Grid>
-    </Border>
-</Grid>
 
-<Grid Grid.Column="2">
-    <StackPanel Orientation="Horizontal">
-        <Button
-            Margin="5"
-            Command="{Binding AddNewItemWindowCommand}"
-            Content="Add New Item"
-            Style="{StaticResource RoundSmallButton}"
-            Tag="{StaticResource AddIcon}" />
+                <Border
+                    Height="45"
+                    HorizontalAlignment="Stretch"
+                    Background="#22272e"
+                    CornerRadius="20">
 
-        <Button
-            Margin="5"
-            Command="{Binding EditCommand}"
-            CommandParameter="{Binding SelectedTransaction}"
-            Content="Change Item"
-            IsEnabled="{Binding IsEditEnabled}"
-            Style="{StaticResource RoundSmallButton}"
-            Tag="{StaticResource ChangeIcon}" />
+                    <Grid Height="Auto">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="60" />
+                        </Grid.ColumnDefinitions>
 
-        <Button
-            Margin="5"
-            Command="{Binding DeleteCommand}"
-            Content="Delete Item"
-            IsEnabled="{Binding IsDeleteEnabled}"
-            Style="{StaticResource RoundSmallButton}"
-            Tag="{StaticResource DeleteIcon}" />
-    </StackPanel>
-</Grid>
+                        <TextBox
+                            Grid.Column="0"
+                            Margin="20,0,0,0"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Stretch"
+                            VerticalContentAlignment="Center"
+                            materialDesign:HintAssist.Foreground="#D9D9D9"
+                            materialDesign:HintAssist.Hint="Search..."
+                            materialDesign:TextFieldAssist.UnderlineBrush="{x:Null}"
+                            Background="Transparent"
+                            BorderThickness="0"
+                            CaretBrush="#fcfefe"
+                            FontSize="16"
+                            Foreground="#D9D9D9"
+                            Style="{StaticResource MaterialDesignTextBox}"
+                            Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                            TextAlignment="Left" />
+
+                        <Ellipse
+                            Grid.Column="1"
+                            Width="35"
+                            Height="35"
+                            Margin="15,0,0,0"
+                            Fill="#D9D9D9" />
+
+                        <materialDesign:PackIcon
+                            Grid.Column="1"
+                            Width="25"
+                            Height="25"
+                            Margin="15,0,0,0"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Foreground="Black"
+                            Kind="Search" />
+                    </Grid>
+                </Border>
+            </Grid>
+
+            <Grid Grid.Column="2">
+                <StackPanel Orientation="Horizontal">
+                    <Button
+                        Margin="5"
+                        Command="{Binding AddNewItemWindowCommand}"
+                        Content="Add New Item"
+                        Style="{StaticResource RoundSmallButton}"
+                        Tag="{StaticResource AddIcon}" />
+
+                    <Button
+                        Margin="5"
+                        Command="{Binding EditCommand}"
+                        CommandParameter="{Binding SelectedTransaction}"
+                        Content="Change Item"
+                        IsEnabled="{Binding IsEditEnabled}"
+                        Style="{StaticResource RoundSmallButton}"
+                        Tag="{StaticResource ChangeIcon}" />
+
+                    <Button
+                        Margin="5"
+                        Command="{Binding DeleteCommand}"
+                        Content="Delete Item"
+                        IsEnabled="{Binding IsDeleteEnabled}"
+                        Style="{StaticResource RoundSmallButton}"
+                        Tag="{StaticResource DeleteIcon}" />
+                </StackPanel>
+            </Grid>
         </Grid>
 
         <Grid Grid.Row="1" Margin="30">
@@ -177,12 +178,18 @@
                 ColumnHeaderStyle="{DynamicResource DataGridColumnHeaderStyle}"
                 EnableColumnVirtualization="True"
                 EnableRowVirtualization="True"
-                IsReadOnly="False"
+                IsReadOnly="True"
                 ItemsSource="{Binding FilteredTransactions, IsAsync=True}"
                 RowHeaderStyle="{DynamicResource DataGridRowHeaderStyle}"
                 RowStyle="{DynamicResource DataGridRowStyle}"
                 SelectedItem="{Binding SelectedTransaction}"
                 Style="{DynamicResource DataGridStyle}">
+
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="SelectionChanged">
+                        <i:InvokeCommandAction Command="{Binding DataGridSelectionChangedCommand}" PassEventArgsToCommand="True" />
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
 
                 <DataGrid.Columns>
                     <DataGridTextColumn
@@ -192,7 +199,7 @@
 
                     <DataGridTextColumn
                         Width="2*"
-                        Binding="{Binding Type}"
+                        Binding="{Binding Type, Converter={StaticResource TypeConverter}}"
                         Header="TRANSACTION" />
 
                     <DataGridTextColumn

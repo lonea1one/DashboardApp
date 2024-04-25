@@ -21,71 +21,17 @@ namespace DashboardProjects.ViewModels;
 
 public class HomeViewModel : BaseViewModel
 {
-    private ObservableCollection<string>? _expenseCategories;
-	public ObservableCollection<string>? ExpenseCategories
-	{
-		get => _expenseCategories;
-		set
-		{
-			_expenseCategories = value;
-			OnPropertyChanged(nameof(ExpenseCategories));
-		}
-	}
-
-	private ObservableCollection<string>? _incomeCategories;
-	public ObservableCollection<string>? IncomeCategories
-	{
-		get => _incomeCategories;
-		set
-		{
-			_incomeCategories = value;
-			OnPropertyChanged(nameof(IncomeCategories));
-		}
-	}
-
-	private ObservableCollection<string>? _years;
-	public ObservableCollection<string>? Years
-	{
-		get => _years;
-		set
-		{
-			_years = value;
-			OnPropertyChanged(nameof(Years));
-		}
-	}
-
-	private ObservableCollection<int>? _selectedExpenses;
-	public ObservableCollection<int>? SelectedExpenses
-	{
-		get => _selectedExpenses;
-		set
-		{
-			_selectedExpenses = value;
-			OnPropertyChanged(nameof(SelectedExpenses));
-		}
-	}
-
-	private ObservableCollection<int>? _selectedIncomes;
-	public ObservableCollection<int>? SelectedIncomes
-	{
-		get => _selectedIncomes;
-		set
-		{
-			_selectedIncomes = value;
-			OnPropertyChanged(nameof(SelectedIncomes));
-		}
-	}
-
-	private ObservableCollection<int>? _selectedYears;
-	public ObservableCollection<int>? SelectedYears
-	{
-		get => _selectedYears;
-		set
-		{
-			_selectedYears = value;
-			OnPropertyChanged(nameof(SelectedYears));
-		}
-	}
+	public ObservableCollection<string>? ExpenseCategories { get; set; }
+	
+	public ObservableCollection<string>? IncomeCategories { get; set; }
+	
+	public ObservableCollection<string>? Years { get; set; }
+	
+	public ObservableCollection<int>? SelectedExpenses { get; set; }
+	
+	public ObservableCollection<int>? SelectedIncomes { get; set; }
+	
+	public ObservableCollection<int>? SelectedYears { get; set; }
 
 	public SeriesCollection ExpenseCollection { get; }
 	public SeriesCollection IncomeCollection { get; }
@@ -114,238 +60,49 @@ public class HomeViewModel : BaseViewModel
 
 	public ICommand FileDragOverCommand { get; private set; }
 	public ICommand FileDropCommand { get; private set; }
+	
+	public string? SelectedExpenseSum { get; set; }
+	
+	public string? SelectedIncomeSum { get; set; }
+	
+	public string? TotalExpenseSum { get; set; }
+	
+	public string? TotalBalance { get; set; }
+	
+	public string? TotalIncomeSum { get; set; }
+	
+	public string? PercentageExpense { get; set; }
+	
+	public string? PercentageIncome { get; set; }
+	
+	public string? FirstQuartalBalance { get; set; }
+	
+	public string? SecondQuartalBalance { get; set; }
+	
+	public string? ThirdQuartalBalance { get; set; }
+	
+	public string? FourdQuartalBalance { get; set; }
+	
+	public string[]? ExpenseLabels { get; set; }
+	
+	public string[]? IncomeLabels { get; set; }
+	
+	public string[]? BalanceLabels { get; set; }
+	
+	public string SelectedExpenseAmount { get; set; }
+	
+	public string SelectedIncomeAmount { get; set; }
+	
+	public string SelectedPercentageExpense { get; set; }
+	
+	public string SelectedPercentageIncome { get; set; }
 
-	private string? _selectedExpenseSum;
-	public string? SelectedExpenseSum
-	{
-		get => _selectedExpenseSum;
-		set
-		{
-			_selectedExpenseSum = value;
-			OnPropertyChanged(nameof(SelectedExpenseSum));
-		}
-	}
-
-	private string? _selectedIncomeSum;
-	public string? SelectedIncomeSum
-	{
-		get => _selectedIncomeSum;
-		set
-		{
-			_selectedIncomeSum = value;
-			OnPropertyChanged(nameof(SelectedIncomeSum));
-		}
-	}
-
-	private string? _totalExpenseSum;
-	public string? TotalExpenseSum
-	{
-		get => _totalExpenseSum;
-		set
-		{
-			_totalExpenseSum = value;
-			OnPropertyChanged(nameof(TotalExpenseSum));
-		}
-	}
-
-	private string? _totalBalance;
-	public string? TotalBalance
-	{
-		get => _totalBalance;
-		set
-		{
-			_totalBalance = value;
-			OnPropertyChanged(nameof(TotalBalance));
-		}
-	}
-
-	private string? _totalIncomeSum;
-	public string? TotalIncomeSum
-	{
-		get => _totalIncomeSum;
-		set
-		{
-			_totalIncomeSum = value;
-			OnPropertyChanged(nameof(TotalIncomeSum));
-		}
-	}
-
-	private string? _percentageExpense;
-	public string? PercentageExpense
-	{
-		get => _percentageExpense;
-		set
-		{
-			_percentageExpense = value;
-			OnPropertyChanged(nameof(PercentageExpense));
-		}
-	}
-
-	private string? _percentageIncome;
-	public string? PercentageIncome
-	{
-		get => _percentageIncome;
-		set
-		{
-			_percentageIncome = value;
-			OnPropertyChanged(nameof(PercentageIncome));
-		}
-	}
-
-	private string? _firstQuartalBalance;
-	public string? FirstQuartalBalance
-	{
-		get => _firstQuartalBalance;
-		set
-		{
-			_firstQuartalBalance = value;
-			OnPropertyChanged(nameof(FirstQuartalBalance));
-		}
-	}
-
-	private string? _secondQuartalBalance;
-	public string? SecondQuartalBalance
-	{
-		get => _secondQuartalBalance;
-		set
-		{
-			_secondQuartalBalance = value;
-			OnPropertyChanged(nameof(SecondQuartalBalance));
-		}
-	}
-
-	private string? _thirdQuartalBalance;
-	public string? ThirdQuartalBalance
-	{
-		get => _thirdQuartalBalance;
-		set
-		{
-			_thirdQuartalBalance = value;
-			OnPropertyChanged(nameof(ThirdQuartalBalance));
-		}
-	}
-
-	private string? _fourdQuartalBalance;
-	public string? FourdQuartalBalance
-	{
-		get => _fourdQuartalBalance;
-		set
-		{
-			_fourdQuartalBalance = value;
-			OnPropertyChanged(nameof(FourdQuartalBalance));
-		}
-	}
-
-	private string[]? _expenseLabels;
-	public string[]? ExpenseLabels
-	{
-		get => _expenseLabels;
-		set
-		{
-			_expenseLabels = value;
-			OnPropertyChanged(nameof(ExpenseLabels));
-		}
-	}
-
-	private string[]? _incomeLabels;
-	public string[]? IncomeLabels
-	{
-		get => _incomeLabels;
-		set
-		{
-			_incomeLabels = value;
-			OnPropertyChanged(nameof(IncomeLabels));
-		}
-	}
-
-	private string[]? _balanceLabels;
-	public string[]? BalanceLabels
-	{
-		get => _balanceLabels;
-		set
-		{
-			_balanceLabels = value;
-			OnPropertyChanged(nameof(BalanceLabels));
-		}
-	}
-
-	private string _selectedExpenseAmount;
-	public string SelectedExpenseAmount
-	{
-		get => _selectedExpenseAmount;
-		set
-		{
-			_selectedExpenseAmount = value;
-			OnPropertyChanged(nameof(SelectedExpenseAmount));
-		}
-	}
-
-	private string _selectedIncomeAmount;
-	public string SelectedIncomeAmount
-	{
-		get => _selectedIncomeAmount;
-		set
-		{
-			_selectedIncomeAmount = value;
-			OnPropertyChanged(nameof(SelectedIncomeAmount));
-		}
-	}
-
-	private string _selectedPercentageExpense;
-	public string SelectedPercentageExpense
-	{
-		get => _selectedPercentageExpense;
-		set
-		{
-			_selectedPercentageExpense = value;
-			OnPropertyChanged(nameof(SelectedPercentageExpense));
-		}
-	}
-
-	private string _selectedPercentageIncome;
-	public string SelectedPercentageIncome
-	{
-		get => _selectedPercentageIncome;
-		set
-		{
-			_selectedPercentageIncome = value;
-			OnPropertyChanged(nameof(SelectedPercentageIncome));
-		}
-	}
-
-	private Point _startPoint;
-	public Point StartPoint
-	{
-		get => _startPoint;
-		set
-		{
-			_startPoint = value;
-			OnPropertyChanged(nameof(StartPoint));
-		}
-	}
-
-	private bool _isSelecting;
-	public bool IsSelecting
-	{
-		get => _isSelecting;
-		set
-		{
-			_isSelecting = value;
-			OnPropertyChanged(nameof(IsSelecting));
-		}
-	}
-
-	private bool _hasExpenseData;
-	public bool HasExpenseData
-	{
-		get => _hasExpenseData;
-		set
-		{
-			if (_hasExpenseData == value) return;
-			_hasExpenseData = value;
-			OnPropertyChanged(nameof(HasExpenseData));
-		}
-	}
+	
+	public Point StartPoint { get; set; }
+	
+	public bool IsSelecting { get; set; }
+	
+	public bool HasExpenseData { get; set; }
 
 	private bool _hasIncomeData;
 	public bool HasIncomeData
@@ -358,28 +115,10 @@ public class HomeViewModel : BaseViewModel
 			OnPropertyChanged(nameof(HasIncomeData));
 		}
 	}
-
-	private bool _isChartIncomeAvailable;
-	public bool IsChartIncomeAvailable
-	{
-		get => _isChartIncomeAvailable;
-		set
-		{
-			_isChartIncomeAvailable = value;
-			OnPropertyChanged(nameof(IsChartIncomeAvailable));
-		}
-	}
-
-	private bool _isChartExpenseAvailable;
-	public bool IsChartExpenseAvailable
-	{
-		get => _isChartExpenseAvailable;
-		set
-		{
-			_isChartExpenseAvailable = value;
-			OnPropertyChanged(nameof(IsChartExpenseAvailable));
-		}
-	}
+	
+	public bool IsChartIncomeAvailable { get; set; }
+	
+	public bool IsChartExpenseAvailable { get; set; }
 
 	private Visibility _progressVisibility = Visibility.Collapsed;
 	public Visibility ProgressVisibility
@@ -404,17 +143,8 @@ public class HomeViewModel : BaseViewModel
 			OnPropertyChanged(nameof(UploadVisibility));
 		}
 	}
-
-	private bool _mouseMoved;
-	public bool MouseMoved
-	{
-		get => _mouseMoved;
-		set
-		{
-			_mouseMoved = value;
-			OnPropertyChanged(nameof(MouseMoved));
-		}
-	}
+	
+	public bool MouseMoved { get; set; }
 
 	public HomeViewModel()
 	{
@@ -595,7 +325,7 @@ public class HomeViewModel : BaseViewModel
 			await using var context = new DashboardDbContext();
 
 			// Передаем путь к файлу и ожидаем завершения асинхронной операции
-			await context.ReadAndSaveExcelData(files[0]);
+			await DashboardDbContext.ReadAndSaveExcelData(files[0]);
 
 			Application.Current.Dispatcher.Invoke(InitializeSelectedItems);
 		}

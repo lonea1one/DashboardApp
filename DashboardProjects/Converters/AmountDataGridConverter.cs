@@ -1,9 +1,10 @@
 ﻿using System.Globalization;
+using System.Windows;
 using System.Windows.Data;
 
 namespace DashboardProjects.Converters
 {
-	internal class AmountDataGridConverter : IValueConverter
+	public class AmountDataGridConverter : IValueConverter
 	{
 		public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
 		{
@@ -16,7 +17,15 @@ namespace DashboardProjects.Converters
 
 		public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
 		{
-			throw new NotImplementedException();
+			if (value is not string stringValue) return value;
+			if (decimal.TryParse(stringValue.Replace(" ₽", ""), out decimal amount))
+			{
+				return amount;
+			}
+			
+			MessageBox.Show("Некорректная сумма", "Предупреждение", MessageBoxButton.OK, MessageBoxImage.Warning);
+			return value;
+
 		}
 	}
 }

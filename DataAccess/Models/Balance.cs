@@ -16,6 +16,6 @@ public class Balance
 
     public decimal BalanceAmount { get; set; }
 
-	[NotMapped] // ���������, ��� ��� �������� �� ������ ���� ���������� � ������� ���� ������
+	[NotMapped]
 	public string MonthName => System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(Month);
 }

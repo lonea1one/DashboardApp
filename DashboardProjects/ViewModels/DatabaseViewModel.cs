@@ -8,44 +8,18 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using DashboardProjects.Utils;
 using DashboardProjects.Views;
+using MaterialDesignThemes.Wpf;
 
 namespace DashboardProjects.ViewModels;
 
-public class DatabaseViewModel : BaseViewModel
+public partial class DatabaseViewModel : BaseViewModel
 {
-	private ObservableCollection<string> _years;
-	public ObservableCollection<string> Years
-	{
-		get => _years;
-		set
-		{
-			_years = value;
-			OnPropertyChanged(nameof(Years));
-		}
-	}
+	public ObservableCollection<string> Years { get; set; }
+	
+	public ObservableCollection<int> SelectedYears { get; set; }
+	
+	public ObservableCollection<Transaction> Transactions { get; set; }
 
-	private ObservableCollection<int> _selectedYears;
-	public ObservableCollection<int> SelectedYears
-	{
-		get => _selectedYears;
-		set
-		{
-			_selectedYears = value;
-			OnPropertyChanged(nameof(SelectedYears));
-			ApplyFilters();
-		}
-	}
-
-	private ObservableCollection<Transaction> _transactions;
-	public ObservableCollection<Transaction> Transactions
-	{
-		get => _transactions;
-		set
-		{
-			_transactions = value;
-			OnPropertyChanged(nameof(Transactions));
-		}
-	}
 
 	private Transaction _selectedTransaction;
 	public Transaction SelectedTransaction
@@ -59,79 +33,28 @@ public class DatabaseViewModel : BaseViewModel
 			IsDeleteEnabled = _selectedTransaction != null;
 		}
 	}
+	
+	public ObservableCollection<Transaction> FilteredTransactions { get; set; }
 
-	private ObservableCollection<Transaction> _filteredTransactions;
-	public ObservableCollection<Transaction> FilteredTransactions
-	{
-		get => _filteredTransactions;
-		set
-		{
-			_filteredTransactions = value;
-			OnPropertyChanged(nameof(FilteredTransactions));
-		}
-	}
 
 	public ICommand LbMouseLeftButtonDownCommand { get; private set; }
+	public ICommand DataGridSelectionChangedCommand { get; private set; }
 	public ICommand LbMouseMoveCommand { get; private set; }
 	public ICommand LbMouseLeftButtonUpCommand { get; private set; }
 	public ICommand AddNewItemWindowCommand { get; }
 	public ICommand DeleteCommand { get; }
 	public ICommand EditCommand { get; }
+	
+	
+	public bool IsEditEnabled { get; set; }
+	
+	public bool IsDeleteEnabled { get; set; }
+	
+	public Point StartPoint { get; set; }
 
-	private bool _isEditEnabled;
-	public bool IsEditEnabled
-	{
-		get => _isEditEnabled;
-		set
-		{
-			_isEditEnabled = value;
-			OnPropertyChanged(nameof(IsEditEnabled));
-		}
-	}
-
-	private bool _isDeleteEnabled;
-	public bool IsDeleteEnabled
-	{
-		get => _isDeleteEnabled;
-		set
-		{
-			_isDeleteEnabled = value;
-			OnPropertyChanged(nameof(IsDeleteEnabled));
-		}
-	}
-
-	private Point _startPoint;
-	public Point StartPoint
-	{
-		get => _startPoint;
-		set
-		{
-			_startPoint = value;
-			OnPropertyChanged(nameof(StartPoint));
-		}
-	}
-
-	private bool _isSelecting;
-	public bool IsSelecting
-	{
-		get => _isSelecting;
-		set
-		{
-			_isSelecting = value;
-			OnPropertyChanged(nameof(IsSelecting));
-		}
-	}
-
-	private bool _mouseMoved;
-	public bool MouseMoved
-	{
-		get => _mouseMoved;
-		set
-		{
-			_mouseMoved = value;
-			OnPropertyChanged(nameof(MouseMoved));
-		}
-	}
+	public bool IsSelecting { get; set; }
+	
+	public bool MouseMoved { get; set; }
 
 	private string _searchText;
 	public string SearchText
@@ -145,6 +68,9 @@ public class DatabaseViewModel : BaseViewModel
 		}
 	}
 
+	[System.Text.RegularExpressions.GeneratedRegex(@"^[0-9.]+$")]
+	private static partial System.Text.RegularExpressions.Regex MyRegex();
+
 	public DatabaseViewModel()
 	{
 		Years = [];
@@ -153,6 +79,8 @@ public class DatabaseViewModel : BaseViewModel
 		LbMouseLeftButtonDownCommand = new RelayCommand<MouseButtonEventArgs>(OnPreviewMouseLeftButtonDown);
 		LbMouseMoveCommand = new RelayCommand<MouseEventArgs>(OnPreviewMouseMove);
 		LbMouseLeftButtonUpCommand = new RelayCommand<MouseButtonEventArgs>(OnPreviewMouseLeftButtonUp);
+		
+		DataGridSelectionChangedCommand = new RelayCommand(OnDataGridSelectionChanged);
 
 		EditCommand = new RelayCommand(EditTransaction);
 		DeleteCommand = new RelayCommand(DeleteTransaction);
@@ -224,6 +152,14 @@ public class DatabaseViewModel : BaseViewModel
 		FilteredTransactions = new ObservableCollection<Transaction>(filteredTransactions);
 	}
 
+	private void OnDataGridSelectionChanged(object parameter)
+	{
+		var args = parameter as SelectionChangedEventArgs;
+		if (args?.Source is not DataGrid dataGrid) return;
+		
+		SelectedTransaction = dataGrid.SelectedItem as Transaction;
+	}
+	
 	private void OnPreviewMouseLeftButtonDown(object parameter)
 	{
 		var args = parameter as MouseButtonEventArgs;
@@ -273,37 +209,19 @@ public class DatabaseViewModel : BaseViewModel
 
 		ApplyFilters();
 	}
-
+	
 	private static void OnOpenAddNewItemWindowCommand(object parameter)
 	{
 		AddTransactionView addTransactionView = new();
-		addTransactionView.Show();
+		addTransactionView.ShowDialog();
 	}
 
 	private void EditTransaction(object parameter)
 	{
-		if (parameter != null)
-		{
-			SelectedTransaction = (Transaction)parameter;
-			IsEditEnabled = true;
-		}
-
 		if (SelectedTransaction == null) return;
-		using (var context = new DashboardDbContext())
-		{
-			var existingTransaction = context.Transactions.Find(SelectedTransaction.Id);
-			if (existingTransaction != null)
-			{
-				existingTransaction.Date = SelectedTransaction.Date;
-				existingTransaction.Category = SelectedTransaction.Category;
-				existingTransaction.Amount = SelectedTransaction.Amount;
-				existingTransaction.Type = SelectedTransaction.Type;
 
-				context.SaveChanges();
-			}
-		}
-
-		_ = LoadDataAsync();
+		var addTransactionWindow = new AddTransactionView(SelectedTransaction);
+		addTransactionWindow.ShowDialog();
 	}
 
 	private void DeleteTransaction(object parameter)

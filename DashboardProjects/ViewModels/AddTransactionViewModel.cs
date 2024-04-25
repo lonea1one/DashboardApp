@@ -12,50 +12,24 @@ namespace DashboardProjects.ViewModels
 {
     public partial class AddTransactionViewModel : BaseViewModel
     {
-		private ObservableCollection<string> _categories;
-		public ObservableCollection<string> Categories
-		{
-			get => _categories;
-			set
-			{
-				_categories = value;
-				OnPropertyChanged(nameof(Categories));
-			}
-		}
-
-		private ObservableCollection<string> _types;
-		public ObservableCollection<string> Types
-		{
-			get => _types;
-			set
-			{
-				_types = value;
-				OnPropertyChanged(nameof(Types));
-			}
-		}
-
-		private ObservableCollection<string> _expenseCategories;
-		public ObservableCollection<string> ExpenseCategories
-		{
-			get => _expenseCategories;
-			set
-			{
-				_expenseCategories = value;
-				OnPropertyChanged(nameof(ExpenseCategories));
-			}
-		}
-
-		private ObservableCollection<string> _incomeCategories;
-		public ObservableCollection<string> IncomeCategories
-		{
-			get => _incomeCategories;
-			set
-			{
-				_incomeCategories = value;
-				OnPropertyChanged(nameof(IncomeCategories));
-			}
-		}
-
+		public ObservableCollection<string> Categories { get; set; }
+		public ObservableCollection<string> Types { get; set; }
+		public ObservableCollection<string> ExpenseCategories { get; set; }
+		public ObservableCollection<string> IncomeCategories { get; set; }
+		
+		public string AmountErrorMessage { get; set; }
+		public string TypeErrorMessage { get; set; }
+		public string TransactionErrorMessage { get; set; }
+		public string CategoryErrorMessage { get; set; }
+		public string DateErrorMessage { get; set; }
+		public string SelectedCategory { get; set; }
+		public string SelectedType { get; set; }
+		public DateTime? SelectedDate { get; set; }
+		
+		public decimal? Amount { get; set; }
+		public string? Category { get; set; }
+		
+		
 		private Visibility _dateErrorVisibility = Visibility.Collapsed;
 		public Visibility DateErrorVisibility
 		{
@@ -64,6 +38,17 @@ namespace DashboardProjects.ViewModels
 			{
 				_dateErrorVisibility = value;
 				OnPropertyChanged(nameof(DateErrorVisibility));
+			}
+		}
+		
+		private Visibility _categoryErrorVisibility = Visibility.Collapsed;
+		public Visibility CategoryErrorVisibility
+		{
+			get => _categoryErrorVisibility;
+			set
+			{
+				_categoryErrorVisibility = value;
+				OnPropertyChanged(nameof(CategoryErrorVisibility));
 			}
 		}
 
@@ -100,99 +85,22 @@ namespace DashboardProjects.ViewModels
 			}
 		}
 
-		private string _amountErrorMessage;
-		public string AmountErrorMessage
-		{
-			get => _amountErrorMessage;
-			set
-			{
-				_amountErrorMessage = value;
-				OnPropertyChanged(nameof(AmountErrorMessage));
-			}
-		}
-
-		private string _typeErrorMessage;
-		public string TypeErrorMessage
-		{
-			get => _typeErrorMessage;
-			set
-			{
-				_typeErrorMessage = value;
-				OnPropertyChanged(nameof(TypeErrorMessage));
-			}
-		}
-
-		private string _transactionErrorMessage;
-		public string TransactionErrorMessage
-		{
-			get => _transactionErrorMessage;
-			set
-			{
-				_transactionErrorMessage = value;
-				OnPropertyChanged(nameof(TransactionErrorMessage));
-			}
-		}
-
-		private string _dateErrorMessage;
-		public string DateErrorMessage
-		{
-			get => _dateErrorMessage;
-			set
-			{
-				_dateErrorMessage = value;
-				OnPropertyChanged(nameof(DateErrorMessage));
-			}
-		}
-
-		private string _selectedCategory;
-		public string SelectedCategory
-		{
-			get => _selectedCategory;
-			set
-			{
-				_selectedCategory = value;
-				OnPropertyChanged(nameof(SelectedCategory));
-			}
-		}
-
-		private string _selectedType;
-		public string SelectedType
-		{
-			get => _selectedType;
-			set
-			{
-				_selectedType = value;
-				OnPropertyChanged(nameof(SelectedType));
-			}
-		}
-
-		private DateTime? _selectedDate;
-		public DateTime? SelectedDate
-		{
-			get => _selectedDate;
-			set
-			{
-				_selectedDate = value;
-				OnPropertyChanged(nameof(SelectedDate));
-			}
-		}
-
-
-		private decimal? _amount;
-		public decimal? Amount
-		{
-			get => _amount;
-			set
-			{
-				_amount = value;
-				OnPropertyChanged(nameof(Amount));
-			}
-		}
-
 		public ICommand AddDataCommand { get; }
 		public ICommand CloseWindowCommand { get; }
 		public ICommand CategorySelectionChangedCommand { get; }
-		public ICommand TextInputCommand { get; }
+		public ICommand AmountInputCommand { get; }
+		public ICommand CategoryInputCommand { get; }
+
+		private const string SelectCategoryMessage = "Выберите категорию";
+		private const string EnterOrSelectCategoryMessage = "Введите или выберите категорию";
+		private const string SelectTransactionMessage = "Выберите транзакцию";
+		private const string EnterValidAmountMessage = "Введите правильную сумму.";
+		private const string PositiveAmountMessage = "Сумма должна быть положительной";
+		private const string ExistingCategoryMessage = "Такая категория уже существует";
+		private const string DateOutOfRangeMessage = "Выберите дату в период с 2023 по 2024 год";
+
+		[System.Text.RegularExpressions.GeneratedRegex(@"^[0-9.]+$")]
+		private static partial System.Text.RegularExpressions.Regex MyRegex();
 
 		public AddTransactionViewModel()
         {
@@ -205,10 +113,32 @@ namespace DashboardProjects.ViewModels
 
 			AddDataCommand = new RelayCommand(OnAddDataCommand);
 			CloseWindowCommand = new RelayCommand<Window>(OnCloseWindowCommand);
-			CategorySelectionChangedCommand = new RelayCommand(OnTransactionSelectionChanged);
-			TextInputCommand = new RelayCommand(OnPreviewTextInput);
+			CategorySelectionChangedCommand = new RelayCommand(OnCategorySelectionChanged);
+			AmountInputCommand = new RelayCommand(OnPreviewAmountInput);
+			CategoryInputCommand = new RelayCommand(OnPreviewCategoryInput);
 
-			Task.Run(GetDataAsync);	
+			_ = GetDataAsync();	
+		}
+		
+		public AddTransactionViewModel(Transaction transaction)
+		{
+			Categories = [];
+			Types = [];
+			ExpenseCategories = [];
+			IncomeCategories = [];
+
+			SelectedDate = transaction.Date;
+			SelectedCategory = transaction.Category;
+			SelectedType = transaction.Type;
+			Amount = transaction.Amount;
+
+			AddDataCommand = new RelayCommand(OnAddDataCommand);
+			CloseWindowCommand = new RelayCommand<Window>(OnCloseWindowCommand);
+			CategorySelectionChangedCommand = new RelayCommand(OnCategorySelectionChanged);
+			AmountInputCommand = new RelayCommand(OnPreviewAmountInput);
+			CategoryInputCommand = new RelayCommand(OnPreviewCategoryInput);
+
+			_ = GetDataAsync();	
 		}
 
 		private void OnAddDataCommand(object parameter)
@@ -224,7 +154,7 @@ namespace DashboardProjects.ViewModels
 			}
 		}
 
-		private void OnTransactionSelectionChanged(object parameter)
+		private void OnCategorySelectionChanged(object parameter)
 		{
 			var args = parameter as SelectionChangedEventArgs;
 			if (args?.Source is not ComboBox comboBox) return;
@@ -238,46 +168,112 @@ namespace DashboardProjects.ViewModels
 			{
 				SelectedType = "ДОХОДЫ";
 			}
+			
+			Category = null;
 		}
 
-		private static void OnPreviewTextInput (object parameter)
+		private static void OnPreviewAmountInput (object parameter)
 		{
 			var args = parameter as TextCompositionEventArgs;
 			if (args?.Source is not TextBox textBox) return;
 
 			if (!(string.IsNullOrEmpty(args.Text) || MyRegex().IsMatch(args.Text)))
 			{
-				args.Handled = true; // Если нет, отменяем ввод
+				args.Handled = true; 
 			}
 			else
 			{
-				// Проверяем, содержит ли новый текст только одну запятую
 				if (args.Text == "," && textBox.Text.Contains(','))
 				{
-					args.Handled = true; // Если содержит, отменяем ввод
+					args.Handled = true; 
 				}
 			}
+		}
+		
+		private void OnPreviewCategoryInput (object parameter)
+		{
+			var args = parameter as TextCompositionEventArgs;
+			if (args?.Source is not TextBox textBox) return;
+
+			if (!char.IsLetter(args.Text, 0))
+			{
+				args.Handled = true; 
+			}
+			
+			SelectedCategory = null;
 		}
 
 		private bool Validate()
 		{
 			var isValid = true;
 
-			TransactionErrorMessage = string.IsNullOrWhiteSpace(SelectedCategory) ? "Выберите категорию" : string.Empty;
-			TransactionErrorVisibility = string.IsNullOrWhiteSpace(SelectedCategory) ? Visibility.Visible : Visibility.Collapsed;
-			isValid &= string.IsNullOrWhiteSpace(TransactionErrorMessage);
+			if (string.IsNullOrWhiteSpace(SelectedCategory))
+			{
+				if (string.IsNullOrWhiteSpace(Category))
+				{
+					TransactionErrorMessage = SelectCategoryMessage;
+					TransactionErrorVisibility = Visibility.Visible;
+					
+					CategoryErrorMessage = EnterOrSelectCategoryMessage;
+					CategoryErrorVisibility = Visibility.Visible;
+					
+					isValid = false;
+				}
+				else
+				{
+					CategoryErrorMessage = string.Empty;
+					CategoryErrorVisibility = Visibility.Collapsed;
+				}
+			}
+			else
+			{
+				CategoryErrorMessage = string.Empty;
+				CategoryErrorVisibility = Visibility.Collapsed;
 
-			TypeErrorMessage = string.IsNullOrWhiteSpace(SelectedType) ? "Выберите транзакцию" : string.Empty;
+				TransactionErrorMessage = string.Empty;
+				TransactionErrorVisibility = Visibility.Collapsed;
+			}
+
+			TypeErrorMessage = string.IsNullOrWhiteSpace(SelectedType) ? SelectTransactionMessage : string.Empty;
 			TypeErrorVisibility = string.IsNullOrWhiteSpace(SelectedType) ? Visibility.Visible : Visibility.Collapsed;
 			isValid &= string.IsNullOrWhiteSpace(TypeErrorMessage);
 
-			DateErrorMessage = SelectedDate == default || SelectedDate < new DateTime(DateTime.Now.Year, 1, 1) || SelectedDate > DateTime.Now ? "Выберите дату в текущем году" : string.Empty;
-			DateErrorVisibility = SelectedDate == default || SelectedDate < new DateTime(DateTime.Now.Year, 1, 1) || SelectedDate > DateTime.Now ? Visibility.Visible : Visibility.Collapsed;
+			DateErrorMessage = SelectedDate == default || SelectedDate < new DateTime(2023, 1, 1) || SelectedDate > DateTime.Now ? DateOutOfRangeMessage : string.Empty;
+			DateErrorVisibility = SelectedDate == default || SelectedDate < new DateTime(2023, 1, 1) || SelectedDate > DateTime.Now ? Visibility.Visible : Visibility.Collapsed;
 			isValid &= string.IsNullOrWhiteSpace(DateErrorMessage);
 
-			isValid &= decimal.TryParse(Amount.ToString(), out var amount) && amount > 0;
-			AmountErrorMessage = isValid ? string.Empty : (string.IsNullOrWhiteSpace(Amount.ToString()) ? "Введите правильную сумму." : (amount == 0) ? "Сумма должна быть больше 0"  : "Сумма должна быть положительной");
-			AmountErrorVisibility = isValid ? Visibility.Collapsed : Visibility.Visible;
+			if (string.IsNullOrWhiteSpace(Amount.ToString()))
+			{
+				AmountErrorMessage = EnterValidAmountMessage;
+				isValid = false;
+			}
+			else
+			{
+				if (Amount <= 0)
+				{
+					AmountErrorMessage = PositiveAmountMessage;
+					isValid = false;
+				}
+				else
+				{
+					AmountErrorMessage = string.Empty;
+				}
+			}
+			AmountErrorVisibility = string.IsNullOrWhiteSpace(AmountErrorMessage) ? Visibility.Collapsed : Visibility.Visible;
+
+			if (!string.IsNullOrWhiteSpace(Category))
+			{
+				using (var context = new DashboardDbContext())
+				{
+					var existingCategory = context.Transactions.FirstOrDefault(c => c.Category.Equals(Category, StringComparison.OrdinalIgnoreCase));
+					if (existingCategory != null)
+					{
+						CategoryErrorMessage = ExistingCategoryMessage;
+						CategoryErrorVisibility = Visibility.Visible;
+						isValid = false;
+					}
+				}
+			}
 
 			return isValid;
 		}
@@ -304,24 +300,26 @@ namespace DashboardProjects.ViewModels
 
 			if (isValidData)
 			{
-				await using var context = new DashboardDbContext();
-				var transaction = new Transaction
+				await using (var context = new DashboardDbContext())
 				{
-					Date = SelectedDate ?? DateTime.Now,
-					Amount = Amount ?? 0,
-					Category = SelectedCategory,
-					Type = SelectedType
-				};
+					var transactionCategory = !string.IsNullOrWhiteSpace(SelectedCategory) ? SelectedCategory : Category;
+					
+					var transaction = new Transaction
+					{
+						Date = SelectedDate ?? DateTime.Now,
+						Amount = Amount ?? 0,
+						Category = transactionCategory,
+						Type = SelectedType
+					};
 
-				await context.Transactions.AddAsync(transaction);
-				await context.SaveChangesAsync();
-
+					await context.Transactions.AddAsync(transaction);
+					await context.SaveChangesAsync();
+				}
+				
+				
 				EventMediator.OnTransactionAdded();
 				MessageBox.Show("Новый данные были успешно добавлены!");
 			}
-		}
-
-        [System.Text.RegularExpressions.GeneratedRegex(@"^[0-9.]+$")]
-        private static partial System.Text.RegularExpressions.Regex MyRegex();
+		} 
     }
 }

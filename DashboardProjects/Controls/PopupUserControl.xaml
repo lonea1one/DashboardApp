@@ -9,7 +9,7 @@
         <Path
             x:Name="Container"
             Width="300"
-            Height="50"
+            Height="45"
             Margin="10"
             HorizontalAlignment="Center"
             VerticalAlignment="Center"

@@ -16,7 +16,7 @@ public sealed class DashboardDbContext : DbContext
 						.SetBasePath(Directory.GetCurrentDirectory())
 						.Build();
 
-		optionsBuilder.UseSqlite(config.GetConnectionString("SQLiteConnection"));
+		optionsBuilder.UseSqlServer(config.GetConnectionString("SQLServerConnection"));
 	}
 
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -79,7 +79,7 @@ public sealed class DashboardDbContext : DbContext
 		});
 	}
 
-	public async Task ReadAndSaveExcelData(string filePath)
+	public static async Task ReadAndSaveExcelData(string filePath)
 	{
 		var newData = await ReadExcelDataAsync(filePath);
 
