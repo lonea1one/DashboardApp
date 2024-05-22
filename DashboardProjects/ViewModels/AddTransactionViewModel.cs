@@ -25,6 +25,12 @@ namespace DashboardProjects.ViewModels
 		public string SelectedCategory { get; set; }
 		public string SelectedType { get; set; }
 		public DateTime? SelectedDate { get; set; }
+
+		public bool CategoryValid { get; set; } = true;
+		public bool TypeValid { get; set; } = true;
+		public bool TransactionValid { get; set; } = true;
+		public bool AmounValid { get; set; } = true;
+		public bool DateValid { get; set; } = true;
 		
 		public decimal? Amount { get; set; }
 		public string? Category { get; set; }
@@ -216,6 +222,9 @@ namespace DashboardProjects.ViewModels
 					
 					CategoryErrorMessage = EnterOrSelectCategoryMessage;
 					CategoryErrorVisibility = Visibility.Visible;
+
+					CategoryValid = false;
+					TransactionValid = false;
 					
 					isValid = false;
 				}
@@ -223,6 +232,8 @@ namespace DashboardProjects.ViewModels
 				{
 					CategoryErrorMessage = string.Empty;
 					CategoryErrorVisibility = Visibility.Collapsed;
+
+					CategoryValid = true;
 				}
 			}
 			else
@@ -232,19 +243,25 @@ namespace DashboardProjects.ViewModels
 
 				TransactionErrorMessage = string.Empty;
 				TransactionErrorVisibility = Visibility.Collapsed;
-			}
+
+                CategoryValid = true;
+                TransactionValid = true;
+            }
 
 			TypeErrorMessage = string.IsNullOrWhiteSpace(SelectedType) ? SelectTransactionMessage : string.Empty;
 			TypeErrorVisibility = string.IsNullOrWhiteSpace(SelectedType) ? Visibility.Visible : Visibility.Collapsed;
 			isValid &= string.IsNullOrWhiteSpace(TypeErrorMessage);
+            TypeValid = !string.IsNullOrWhiteSpace(SelectedType);
 
-			DateErrorMessage = SelectedDate == default || SelectedDate < new DateTime(2023, 1, 1) || SelectedDate > DateTime.Now ? DateOutOfRangeMessage : string.Empty;
+            DateErrorMessage = SelectedDate == default || SelectedDate < new DateTime(2023, 1, 1) || SelectedDate > DateTime.Now ? DateOutOfRangeMessage : string.Empty;
 			DateErrorVisibility = SelectedDate == default || SelectedDate < new DateTime(2023, 1, 1) || SelectedDate > DateTime.Now ? Visibility.Visible : Visibility.Collapsed;
 			isValid &= string.IsNullOrWhiteSpace(DateErrorMessage);
+            DateValid = SelectedDate >= new DateTime(2023, 1, 1) && SelectedDate <= DateTime.Now;
 
-			if (string.IsNullOrWhiteSpace(Amount.ToString()))
+            if (string.IsNullOrWhiteSpace(Amount.ToString()))
 			{
 				AmountErrorMessage = EnterValidAmountMessage;
+				AmounValid = false;
 				isValid = false;
 			}
 			else
@@ -252,12 +269,14 @@ namespace DashboardProjects.ViewModels
 				if (Amount <= 0)
 				{
 					AmountErrorMessage = PositiveAmountMessage;
+					AmounValid = false;
 					isValid = false;
 				}
 				else
 				{
 					AmountErrorMessage = string.Empty;
-				}
+                    AmounValid = true;
+                }
 			}
 			AmountErrorVisibility = string.IsNullOrWhiteSpace(AmountErrorMessage) ? Visibility.Collapsed : Visibility.Visible;
 
@@ -271,8 +290,15 @@ namespace DashboardProjects.ViewModels
 						CategoryErrorMessage = ExistingCategoryMessage;
 						CategoryErrorVisibility = Visibility.Visible;
 						isValid = false;
-					}
-				}
+						CategoryValid = false;
+
+                    }
+					else
+					{
+						CategoryValid = true;
+
+                    }
+                }
 			}
 
 			return isValid;

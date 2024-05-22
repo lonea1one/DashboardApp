@@ -8,7 +8,6 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using DashboardProjects.Utils;
 using DashboardProjects.Views;
-using MaterialDesignThemes.Wpf;
 
 namespace DashboardProjects.ViewModels;
 
