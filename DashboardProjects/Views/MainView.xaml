@@ -215,6 +215,12 @@
                                 <i:EventTrigger EventName="Click">
                                     <i:InvokeCommandAction Command="{Binding CloseCommand}" PassEventArgsToCommand="True" />
                                 </i:EventTrigger>
+                                <i:EventTrigger EventName="MouseEnter">
+                                    <i:InvokeCommandAction Command="{Binding MouseEnterCommand}" PassEventArgsToCommand="True" />
+                                </i:EventTrigger>
+                                <i:EventTrigger EventName="MouseLeave">
+                                    <i:InvokeCommandAction Command="{Binding MouseLeaveCommand}" PassEventArgsToCommand="True" />
+                                </i:EventTrigger>
                             </i:Interaction.Triggers>
 
                         </Button>
@@ -224,6 +230,12 @@
                             <i:Interaction.Triggers>
                                 <i:EventTrigger EventName="Click">
                                     <i:InvokeCommandAction Command="{Binding MaximizeRestoreCommand}" PassEventArgsToCommand="True" />
+                                </i:EventTrigger>
+                                <i:EventTrigger EventName="MouseEnter">
+                                    <i:InvokeCommandAction Command="{Binding MouseEnterCommand}" PassEventArgsToCommand="True" />
+                                </i:EventTrigger>
+                                <i:EventTrigger EventName="MouseLeave">
+                                    <i:InvokeCommandAction Command="{Binding MouseLeaveCommand}" PassEventArgsToCommand="True" />
                                 </i:EventTrigger>
                             </i:Interaction.Triggers>
 
@@ -246,8 +258,13 @@
                                 <i:EventTrigger EventName="Click">
                                     <i:InvokeCommandAction Command="{Binding MinimizeCommand}" PassEventArgsToCommand="True" />
                                 </i:EventTrigger>
+                                <i:EventTrigger EventName="MouseEnter">
+                                    <i:InvokeCommandAction Command="{Binding MouseEnterCommand}" PassEventArgsToCommand="True" />
+                                </i:EventTrigger>
+                                <i:EventTrigger EventName="MouseLeave">
+                                    <i:InvokeCommandAction Command="{Binding MouseLeaveCommand}" PassEventArgsToCommand="True" />
+                                </i:EventTrigger>
                             </i:Interaction.Triggers>
-
                         </Button>
                     </StackPanel>
                 </Border>
