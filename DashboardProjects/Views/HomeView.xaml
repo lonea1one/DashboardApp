@@ -327,10 +327,10 @@
                         <Grid Grid.Column="1">
                             <ListBox
                                 x:Name="ExpenseLb"
+                                Height="Auto"
                                 MinWidth="100"
-                                MinHeight="180"
                                 Margin="5,30,0,20"
-                                VerticalAlignment="Center"
+                                VerticalAlignment="Top"
                                 BorderThickness="0"
                                 FontSize="12"
                                 IsEnabled="{Binding HasExpenseData}"
@@ -411,10 +411,10 @@
                         <Grid Grid.Column="1">
                             <ListBox
                                 x:Name="IncomeLb"
+                                Height="Auto"
                                 MinWidth="100"
-                                MinHeight="180"
                                 Margin="5,30,0,20"
-                                VerticalAlignment="Center"
+                                VerticalAlignment="Top"
                                 BorderThickness="0"
                                 FontSize="12"
                                 IsEnabled="{Binding HasIncomeData}"

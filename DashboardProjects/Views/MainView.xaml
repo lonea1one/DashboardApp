@@ -79,35 +79,85 @@
                                 CommandParameter="Home"
                                 IsChecked="True"
                                 Style="{DynamicResource MenuRadioButtonStyle}"
-                                Tag="{DynamicResource Home}" />
+                                Tag="{DynamicResource Home}">
+
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="MouseEnter">
+                                        <i:InvokeCommandAction Command="{Binding MouseEnterCommand}" PassEventArgsToCommand="True" />
+                                    </i:EventTrigger>
+                                    <i:EventTrigger EventName="MouseLeave">
+                                        <i:InvokeCommandAction Command="{Binding MouseLeaveCommand}" PassEventArgsToCommand="True" />
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
+                            </RadioButton>
 
                             <RadioButton
                                 Margin="0,5,0,5"
                                 Command="{Binding UpdateViewCommand}"
                                 CommandParameter="Database"
                                 Style="{DynamicResource MenuRadioButtonStyle}"
-                                Tag="{DynamicResource Database}" />
+                                Tag="{DynamicResource Database}">
+
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="MouseEnter">
+                                        <i:InvokeCommandAction Command="{Binding MouseEnterCommand}" PassEventArgsToCommand="True" />
+                                    </i:EventTrigger>
+                                    <i:EventTrigger EventName="MouseLeave">
+                                        <i:InvokeCommandAction Command="{Binding MouseLeaveCommand}" PassEventArgsToCommand="True" />
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
+                            </RadioButton>
 
                             <RadioButton
                                 Margin="0,5,0,5"
                                 Command="{Binding UpdateViewCommand}"
                                 CommandParameter="Bookmarks"
                                 Style="{DynamicResource MenuRadioButtonStyle}"
-                                Tag="{DynamicResource Bookmarks}" />
+                                Tag="{DynamicResource Bookmarks}">
+
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="MouseEnter">
+                                        <i:InvokeCommandAction Command="{Binding MouseEnterCommand}" PassEventArgsToCommand="True" />
+                                    </i:EventTrigger>
+                                    <i:EventTrigger EventName="MouseLeave">
+                                        <i:InvokeCommandAction Command="{Binding MouseLeaveCommand}" PassEventArgsToCommand="True" />
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
+                            </RadioButton>
 
                             <RadioButton
                                 Margin="0,5,0,5"
                                 Command="{Binding UpdateViewCommand}"
                                 CommandParameter="Settings"
                                 Style="{DynamicResource MenuRadioButtonStyle}"
-                                Tag="{DynamicResource Settings}" />
+                                Tag="{DynamicResource Settings}">
+
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="MouseEnter">
+                                        <i:InvokeCommandAction Command="{Binding MouseEnterCommand}" PassEventArgsToCommand="True" />
+                                    </i:EventTrigger>
+                                    <i:EventTrigger EventName="MouseLeave">
+                                        <i:InvokeCommandAction Command="{Binding MouseLeaveCommand}" PassEventArgsToCommand="True" />
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
+                            </RadioButton>
 
                             <RadioButton
                                 x:Name="Logout"
                                 Margin="0,360,0,5"
                                 VerticalAlignment="Bottom"
                                 Style="{DynamicResource MenuRadioButtonStyle}"
-                                Tag="{DynamicResource Logout}" />
+                                Tag="{DynamicResource Logout}">
+
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="MouseEnter">
+                                        <i:InvokeCommandAction Command="{Binding MouseEnterCommand}" PassEventArgsToCommand="True" />
+                                    </i:EventTrigger>
+                                    <i:EventTrigger EventName="MouseLeave">
+                                        <i:InvokeCommandAction Command="{Binding MouseLeaveCommand}" PassEventArgsToCommand="True" />
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
+                            </RadioButton>
 
                         </StackPanel>
                     </DockPanel>

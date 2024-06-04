@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Windows.Controls;
 using System.Windows;
+using System.Windows.Input;
 
 namespace DashboardProjects.Behaviors;
 
@@ -24,13 +25,27 @@ public class ListBoxSelectionBehavior : Behavior<ListBox>
 	protected override void OnAttached()
     {
         base.OnAttached();
+        AssociatedObject.MouseEnter += OnMouseEnter;
+        AssociatedObject.MouseLeave += OnMouseLeave;
         SelectedItems.CollectionChanged += OnSelectedItemsCollectionChanged;
     }
 
     protected override void OnDetaching()
     {
         base.OnDetaching();
+        AssociatedObject.MouseEnter -= OnMouseEnter;
+        AssociatedObject.MouseLeave -= OnMouseLeave;
         SelectedItems.CollectionChanged -= OnSelectedItemsCollectionChanged;
+    }
+
+    private void OnMouseEnter(object sender, MouseEventArgs e)
+    {
+        Mouse.OverrideCursor = Cursors.Hand;
+    }
+
+    private void OnMouseLeave(object sender, MouseEventArgs e)
+    {
+        Mouse.OverrideCursor = Cursors.Arrow;
     }
 
     private static void OnSelectedItemsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
