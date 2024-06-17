@@ -1,7 +1,7 @@
-﻿using ClosedXML.Excel;
-using DataAccess.Models;
+﻿using DataAccess.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using OfficeOpenXml;
 
 namespace DataAccess;
 public sealed class DashboardDbContext : DbContext
@@ -11,13 +11,13 @@ public sealed class DashboardDbContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-		var config = new ConfigurationBuilder()
-						.AddJsonFile("appsettings.json")
-						.SetBasePath(Directory.GetCurrentDirectory())
-						.Build();
+        var config = new ConfigurationBuilder()
+                        .AddJsonFile("appsettings.json")
+                        .SetBasePath(Directory.GetCurrentDirectory())
+                        .Build();
 
-		optionsBuilder.UseSqlServer(config.GetConnectionString("SQLServerConnection"));
-	}
+        optionsBuilder.UseSqlServer(config.GetConnectionString("SQLServerWorkConnection"));
+    }
 
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{
@@ -30,161 +30,151 @@ public sealed class DashboardDbContext : DbContext
 		transaction.HasIndex(t => t.Category);
 	}
 
-	public async Task SeedDataAsync()
-	{
-		if (await Database.CanConnectAsync())
-		{
-			if (!(await Transactions.AnyAsync())) // Используем AnyAsync для асинхронной проверки
-			{
-				var data = await ReadExcelDataAsync(@"Files/dashboard.xlsx");
-				Transactions.AddRange(data); 
-				await SaveChangesAsync(); 
-				await UpdateBalancesAsync();
-			}
-		}
-	}
+    public async Task SeedDataAsync()
+    {
+        if (await Database.CanConnectAsync())
+        {
+            if (!(await Transactions.AnyAsync()))
+            {
+                var data = await ReadExcelDataAsync(@"Files/dashboard.xlsx");
+                Transactions.AddRange(data);
+                await SaveChangesAsync();
+                await UpdateBalancesAsync();
+            }
+        }
+    }
 
-	private static async Task<List<Transaction>> ReadExcelDataAsync(string filePath)
-	{
-		return await Task.Run(() =>
-		{
-			var data = new List<Transaction>();
+    private static async Task<List<Transaction>> ReadExcelDataAsync(string filePath)
+    {
+        var data = new List<Transaction>();
 
-			using var workbook = new XLWorkbook(filePath);
-			var worksheet = workbook.Worksheet(1);
-			var rows = worksheet.RangeUsed().RowsUsed();
+        ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+        using var package = new ExcelPackage(new FileInfo(filePath));
+        var worksheet = package.Workbook.Worksheets[0];
+        var rowCount = worksheet.Dimension.Rows;
 
-			var isFirstRow = true;
+        for (var row = 2; row <= rowCount; row++)
+        {
+            var transaction = new Transaction
+            {
+                Date = worksheet.Cells[row, 1].GetValue<DateTime>(),
+                Type = worksheet.Cells[row, 2].GetValue<string>(),
+                Amount = worksheet.Cells[row, 3].GetValue<decimal>(),
+                Category = worksheet.Cells[row, 4].GetValue<string>()
+            };
 
-			foreach (var row in rows)
-			{
-				if (isFirstRow)
-				{
-					isFirstRow = false;
-					continue;
-				}
+            data.Add(transaction);
+        }
 
-				var model = new Transaction
-				{
-					Date = row.Cell(1).GetDateTime(),
-					Type = row.Cell(2).GetValue<string>(),
-					Amount = (decimal)row.Cell(3).GetDouble(),
-					Category = row.Cell(4).GetValue<string>()
-				};
+        return await Task.FromResult(data);
+    }
 
-				data.Add(model);
-			}
+    public static async Task ReadAndSaveExcelData(string filePath)
+    {
+        var newData = await ReadExcelDataAsync(filePath);
 
-			return data;
-		});
-	}
+        await using var context = new DashboardDbContext();
 
-	public static async Task ReadAndSaveExcelData(string filePath)
-	{
-		var newData = await ReadExcelDataAsync(filePath);
+        // Очистка существующих данных
+        context.Transactions.RemoveRange(context.Transactions);
+        context.Balances.RemoveRange(context.Balances);
 
-		await using var context = new DashboardDbContext();
+        // Сохранение изменений
+        await context.SaveChangesAsync();
 
-		// Очистка существующих данных
-		context.Transactions.RemoveRange(context.Transactions);
-		context.Balances.RemoveRange(context.Balances);
+        // Добавление новых данных
+        context.Transactions.AddRange(newData);
 
-		// Сохранение изменений
-		await context.SaveChangesAsync();
+        // Пересчитываем балансы
+        await RecalculateBalancesAsync(context, newData);
 
-		// Добавление новых данных
-		context.Transactions.AddRange(newData);
+        // Сохранение всех изменений, включая новые транзакции и балансы
+        await context.SaveChangesAsync();
+    }
 
-		// Пересчитываем балансы
-		await RecalculateBalancesAsync(context, newData);
+    private static async Task RecalculateBalancesAsync(DashboardDbContext context, IReadOnlyCollection<Transaction> transactions)
+    {
+        // Сброс баланса к начальному значению
+        var initialBalance = 180305.19m; // Начальный баланс
+        var currentDate = new DateTime(2022, 12, 1); // Дата начала
+        var maxDate = transactions.Max(t => t.Date);
 
-		// Сохранение всех изменений, включая новые транзакции и балансы
-		await context.SaveChangesAsync();
-	}
+        while (currentDate <= maxDate)
+        {
+            var nextMonth = currentDate.AddMonths(1);
+            var monthlyTransactions = transactions
+                .Where(t => t.Date >= currentDate && t.Date < nextMonth).ToList();
 
-	private static async Task RecalculateBalancesAsync(DashboardDbContext context, IReadOnlyCollection<Transaction> transactions)
-	{
-		// Сброс баланса к начальному значению
-		var initialBalance = 180305.19m; // Начальный баланс
-		var currentDate = new DateTime(2022, 12, 1); // Дата начала
-		var maxDate = transactions.Max(t => t.Date);
+            var monthlyIncome = (decimal)monthlyTransactions
+                .Where(t => t.Type == "ДОХОДЫ").Sum(t => (double)t.Amount);
 
-		while (currentDate <= maxDate)
-		{
-			var nextMonth = currentDate.AddMonths(1);
-			var monthlyTransactions = transactions
-				.Where(t => t.Date >= currentDate && t.Date < nextMonth).ToList();
+            var monthlyExpenses = (decimal)monthlyTransactions
+                .Where(t => t.Type == "РАСХОДЫ").Sum(t => (double)t.Amount);
 
-			var monthlyIncome = (decimal)monthlyTransactions
-				.Where(t => t.Type == "ДОХОДЫ").Sum(t => (double)t.Amount);
+            // Рассчитываем баланс за месяц
+            initialBalance += monthlyIncome - monthlyExpenses;
 
-			var monthlyExpenses = (decimal)monthlyTransactions
-				.Where(t => t.Type == "РАСХОДЫ").Sum(t => (double)t.Amount);
+            // Добавляем или обновляем запись баланса
+            var balance = new Balance
+            {
+                Year = currentDate.Year,
+                Month = currentDate.Month,
+                BalanceAmount = initialBalance
+            };
+            await context.Balances.AddAsync(balance);
 
-			// Рассчитываем баланс за месяц
-			initialBalance += monthlyIncome - monthlyExpenses;
+            currentDate = nextMonth;
+        }
+    }
 
-			// Добавляем или обновляем запись баланса
-			var balance = new Balance
-			{
-				Year = currentDate.Year,
-				Month = currentDate.Month,
-				BalanceAmount = initialBalance
-			};
-			await context.Balances.AddAsync(balance);
+    private static async Task UpdateBalancesAsync()
+    {
+        var initialBalance = 180305.19m; // Начальный баланс за декабрь 2022
+        var currentDate = new DateTime(2022, 12, 1); // Начинаем с декабря 2022
 
-			currentDate = nextMonth;
-		}
-	}
+        await using var context = new DashboardDbContext();
+        var maxDate = context.Transactions.Max(t => t.Date); // Находим последнюю дату в транзакциях
 
-	private static async Task UpdateBalancesAsync()
-	{
-		var initialBalance = 180305.19m; // Начальный баланс за декабрь 2022
-		var currentDate = new DateTime(2022, 12, 1); // Начинаем с декабря 2022
+        while (currentDate <= maxDate)
+        {
+            var nextMonth = currentDate.AddMonths(1);
 
-		await using var context = new DashboardDbContext();
-		var maxDate = context.Transactions.Max(t => t.Date); // Находим последнюю дату в транзакциях
+            // Суммируем доходы и расходы за месяц
+            var monthlyIncome = (decimal)context.Transactions
+                .Where(t => t.Date >= currentDate && t.Date < nextMonth && t.Type == "ДОХОДЫ")
+                .Sum(t => (double)t.Amount);
 
-		while (currentDate <= maxDate)
-		{
-			var nextMonth = currentDate.AddMonths(1);
+            var monthlyExpenses = (decimal)context.Transactions
+                .Where(t => t.Date >= currentDate && t.Date < nextMonth && t.Type == "РАСХОДЫ")
+                .Sum(t => (double)t.Amount);
 
-			// Суммируем доходы и расходы за месяц
-			var monthlyIncome = (decimal)context.Transactions
-				.Where(t => t.Date >= currentDate && t.Date < nextMonth && t.Type == "ДОХОДЫ")
-				.Sum(t => (double)t.Amount);
+            // Рассчитываем баланс за месяц
+            initialBalance += monthlyIncome - monthlyExpenses;
 
-			var monthlyExpenses = (decimal)context.Transactions
-				.Where(t => t.Date >= currentDate && t.Date < nextMonth && t.Type == "РАСХОДЫ")
-				.Sum(t => (double)t.Amount);
+            // Проверяем, существует ли уже запись баланса за этот месяц
+            var balance = context.Balances
+                .FirstOrDefault(b => b.Year == currentDate.Year && b.Month == currentDate.Month);
 
-			// Рассчитываем баланс за месяц
-			initialBalance += monthlyIncome - monthlyExpenses;
+            if (balance != null)
+            {
+                // Если запись существует, обновляем её
+                balance.BalanceAmount = initialBalance;
+            }
+            else
+            {
+                // Если записи нет, создаём новую
+                await context.Balances.AddAsync(new Balance
+                {
+                    Year = currentDate.Year,
+                    Month = currentDate.Month,
+                    BalanceAmount = initialBalance
+                });
+            }
 
-			// Проверяем, существует ли уже запись баланса за этот месяц
-			var balance = context.Balances
-				.FirstOrDefault(b => b.Year == currentDate.Year && b.Month == currentDate.Month);
+            // Переходим к следующему месяцу
+            currentDate = nextMonth;
+        }
 
-			if (balance != null)
-			{
-				// Если запись существует, обновляем её
-				balance.BalanceAmount = initialBalance;
-			}
-			else
-			{
-				// Если записи нет, создаём новую
-				await context.Balances.AddAsync(new Balance
-				{
-					Year = currentDate.Year,
-					Month = currentDate.Month,
-					BalanceAmount = initialBalance
-				});
-			}
-
-			// Переходим к следующему месяцу
-			currentDate = nextMonth;
-		}
-
-		await context.SaveChangesAsync(); // Сохраняем изменения в базе данных
-	}
+        await context.SaveChangesAsync(); // Сохраняем изменения в базе данных
+    }
 }

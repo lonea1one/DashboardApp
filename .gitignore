@@ -12,3 +12,5 @@
 .vs
 DashboardProjects/bin
 DashboardProjects/obj
+/DataAccess/obj
+/DataAccess/bin/Debug/net8.0
