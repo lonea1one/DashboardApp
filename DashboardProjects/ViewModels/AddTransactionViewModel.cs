@@ -3,6 +3,7 @@ using DashboardProjects.Utils;
 using DataAccess;
 using DataAccess.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
@@ -12,7 +13,10 @@ namespace DashboardProjects.ViewModels
 {
     public partial class AddTransactionViewModel : BaseViewModel
     {
-		public ObservableCollection<string> Categories { get; set; }
+        private readonly ILogger<DatabaseViewModel> _logger;
+        private Transaction _transaction;
+
+        public ObservableCollection<string> Categories { get; set; }
 		public ObservableCollection<string> Types { get; set; }
 		public ObservableCollection<string> ExpenseCategories { get; set; }
 		public ObservableCollection<string> IncomeCategories { get; set; }
@@ -108,9 +112,12 @@ namespace DashboardProjects.ViewModels
 		[System.Text.RegularExpressions.GeneratedRegex(@"^[0-9.]+$")]
 		private static partial System.Text.RegularExpressions.Regex MyRegex();
 
-		public AddTransactionViewModel()
+		public AddTransactionViewModel(ILogger<DatabaseViewModel> logger)
         {
-			Categories = [];
+			_logger = logger;
+            _logger.LogInformation("Создание экземпляра AddTransactionViewModel.");
+
+            Categories = [];
 			Types = [];
 			ExpenseCategories = [];
 			IncomeCategories = [];
@@ -126,12 +133,16 @@ namespace DashboardProjects.ViewModels
 			_ = GetDataAsync();	
 		}
 		
-		public AddTransactionViewModel(Transaction transaction)
+		public AddTransactionViewModel(Transaction transaction, ILogger<DatabaseViewModel> logger)
 		{
-			Categories = [];
+			_logger = logger;
+            _logger.LogInformation("Создание экземпляра AddTransactionViewModel для редактирования транзакции.");
+
+            Categories = [];
 			Types = [];
 			ExpenseCategories = [];
 			IncomeCategories = [];
+			_transaction = transaction;
 
 			SelectedDate = transaction.Date;
 			SelectedCategory = transaction.Category;
@@ -282,70 +293,106 @@ namespace DashboardProjects.ViewModels
 
 			if (!string.IsNullOrWhiteSpace(Category))
 			{
-				using (var context = new DashboardDbContext())
-				{
-					var existingCategory = context.Transactions.FirstOrDefault(c => c.Category.Equals(Category, StringComparison.OrdinalIgnoreCase));
-					if (existingCategory != null)
-					{
-						CategoryErrorMessage = ExistingCategoryMessage;
-						CategoryErrorVisibility = Visibility.Visible;
-						isValid = false;
-						CategoryValid = false;
+				using var context = new DashboardDbContext();
+                var existingCategory = context.Transactions.FirstOrDefault(c => c.Category.Equals(Category, StringComparison.OrdinalIgnoreCase));
+                if (existingCategory != null)
+                {
+                    CategoryErrorMessage = ExistingCategoryMessage;
+                    CategoryErrorVisibility = Visibility.Visible;
+                    isValid = false;
+                    CategoryValid = false;
 
-                    }
-					else
-					{
-						CategoryValid = true;
-
-                    }
                 }
-			}
+                else
+                {
+                    CategoryValid = true;
+
+                }
+            }
 
 			return isValid;
 		}
 
 		private async Task GetDataAsync()
         {
-			await using var context = new DashboardDbContext();
-			var categories = await context.Transactions.Select(x => x.Category.ToString()).Distinct().ToListAsync();
-			var types = await context.Transactions.Select(x => x.Type.ToString()).Distinct().ToListAsync();
+            try
+            {
+                _logger.LogInformation("Загрузка данных для инициализации AddTransactionViewModel.");
 
-			var expenses = await context.Transactions.Where(x => x.Type == "РАСХОДЫ").Select(m => m.Category).Distinct().ToListAsync();
-			var incomes = await context.Transactions.Where(x => x.Type == "ДОХОДЫ").Select(m => m.Category).Distinct().ToListAsync();
+                await using var context = new DashboardDbContext();
+                var categories = await context.Transactions.Select(x => x.Category.ToString()).Distinct().ToListAsync();
+                var types = await context.Transactions.Select(x => x.Type.ToString()).Distinct().ToListAsync();
 
-			Categories = new ObservableCollection<string>(categories);
-			Types = new ObservableCollection<string>(types);
-			
-			ExpenseCategories = new ObservableCollection<string>(expenses);
-			IncomeCategories = new ObservableCollection<string>(incomes);
-		}
+                var expenses = await context.Transactions.Where(x => x.Type == "РАСХОДЫ").Select(m => m.Category).Distinct().ToListAsync();
+                var incomes = await context.Transactions.Where(x => x.Type == "ДОХОДЫ").Select(m => m.Category).Distinct().ToListAsync();
+
+                Categories = new ObservableCollection<string>(categories);
+                Types = new ObservableCollection<string>(types);
+
+                ExpenseCategories = new ObservableCollection<string>(expenses);
+                IncomeCategories = new ObservableCollection<string>(incomes);
+
+                _logger.LogInformation("Данные успешно загружены для AddTransactionViewModel.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Ошибка при загрузке данных для AddTransactionViewModel.");
+            }
+        }
 
 		private async Task AddDataAsync()
 		{
-			var isValidData = Validate();
+            try
+            {
+                _logger.LogInformation("Попытка добавления новой транзакции.");
 
-			if (isValidData)
-			{
-				await using (var context = new DashboardDbContext())
-				{
-					var transactionCategory = !string.IsNullOrWhiteSpace(SelectedCategory) ? SelectedCategory : Category;
-					
-					var transaction = new Transaction
-					{
-						Date = SelectedDate ?? DateTime.Now,
-						Amount = Amount ?? 0,
-						Category = transactionCategory,
-						Type = SelectedType
-					};
+                var isValidData = Validate();
 
-					await context.Transactions.AddAsync(transaction);
-					await context.SaveChangesAsync();
-				}
-				
-				
-				EventMediator.OnTransactionAdded();
-				MessageBox.Show("Новый данные были успешно добавлены!");
-			}
-		} 
+                if (isValidData)
+                {
+                    await using var context = new DashboardDbContext();
+                    var transactionCategory = !string.IsNullOrWhiteSpace(SelectedCategory) ? SelectedCategory : Category;
+
+                    if (_transaction.Id > 0)
+                    {
+                        var existingTransaction = await context.Transactions.FindAsync(_transaction.Id);
+                        if (existingTransaction != null)
+                        {
+                            existingTransaction.Date = SelectedDate ?? DateTime.Now;
+                            existingTransaction.Amount = Amount ?? 0;
+                            existingTransaction.Category = SelectedCategory;
+                            existingTransaction.Type = SelectedType;
+
+                            await context.SaveChangesAsync();
+                            _logger.LogInformation($"Транзакция с ID {_transaction.Id} успешно изменена.");
+                            MessageBox.Show("Данные были успешно изменены!");
+                        }
+                    }
+                    else
+                    {
+                        var transaction = new Transaction
+                        {
+                            Date = SelectedDate ?? DateTime.Now,
+                            Amount = Amount ?? 0,
+                            Category = transactionCategory,
+                            Type = SelectedType
+                        };
+
+                        await context.Transactions.AddAsync(transaction);
+                        await context.SaveChangesAsync();
+
+                        _logger.LogInformation("Новая транзакция успешно добавлена.");
+                        MessageBox.Show("Новые данные были успешно добавлены!");
+                    }
+
+                    EventMediator.OnTransactionAdded();
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Ошибка при добавлении или изменении транзакции.");
+                // Дополнительная обработка ошибки, если требуется
+            }
+        } 
     }
 }

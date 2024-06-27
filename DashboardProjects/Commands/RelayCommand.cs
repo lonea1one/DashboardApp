@@ -48,26 +48,26 @@ public class RelayCommand : ICommand
 		_execute = execute;
 	}
 
-	private RelayCommand(Action<object> execute, Predicate<object> canExecute)
+	public RelayCommand(Action<object> execute, Predicate<object> canExecute)
 	{
         ArgumentNullException.ThrowIfNull(execute);
         _execute = execute;
 		_canExecute = canExecute;
 	}
 
-	public bool CanExecute(object parameter)
-	{
-		return _canExecute == null || _canExecute(parameter);
-	}
+    public RelayCommand(Action execute, Func<bool> canExecute = null)
+    {
+        _execute = _ => execute();
+        _canExecute = _ => canExecute == null || canExecute();
+    }
 
-	public void Execute(object parameter)
-	{
-		_execute(parameter);
-	}
+    public bool CanExecute(object parameter) => _canExecute?.Invoke(parameter) ?? true;
 
-	public event EventHandler CanExecuteChanged
-	{
-		add => CommandManager.RequerySuggested += value;
-		remove => CommandManager.RequerySuggested -= value;
-	}
+    public void Execute(object parameter) => _execute(parameter);
+
+    public event EventHandler CanExecuteChanged
+    {
+        add => CommandManager.RequerySuggested += value;
+        remove => CommandManager.RequerySuggested -= value;
+    }
 }

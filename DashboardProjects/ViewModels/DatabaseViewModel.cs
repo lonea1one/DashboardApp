@@ -1,26 +1,28 @@
 using DashboardProjects.Commands;
-using DataAccess;
 using DataAccess.Models;
-using Microsoft.EntityFrameworkCore;
 using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using DashboardProjects.Utils;
 using DashboardProjects.Views;
+using Microsoft.Extensions.Logging;
+using DashboardProjects.Services;
 
 namespace DashboardProjects.ViewModels;
 
 public partial class DatabaseViewModel : BaseViewModel
 {
-	public ObservableCollection<string> Years { get; set; }
-	
+    private readonly ILogger<DatabaseViewModel> _logger;
+    private readonly TransactionService _transactionService;
+    private INavigationService _navigationService { get; set; }
+
+    public ObservableCollection<string> Years { get; set; }
 	public ObservableCollection<int> SelectedYears { get; set; }
-	
 	public ObservableCollection<Transaction> Transactions { get; set; }
+    public ObservableCollection<Transaction> FilteredTransactions { get; set; }
 
-
-	private Transaction _selectedTransaction;
+    private Transaction _selectedTransaction;
 	public Transaction SelectedTransaction
 	{
 		get => _selectedTransaction;
@@ -33,9 +35,6 @@ public partial class DatabaseViewModel : BaseViewModel
 		}
 	}
 	
-	public ObservableCollection<Transaction> FilteredTransactions { get; set; }
-
-
 	public ICommand LbMouseLeftButtonDownCommand { get; private set; }
 	public ICommand DataGridSelectionChangedCommand { get; private set; }
 	public ICommand LbMouseMoveCommand { get; private set; }
@@ -46,15 +45,10 @@ public partial class DatabaseViewModel : BaseViewModel
 	
 	
 	public bool IsEditEnabled { get; set; }
-	
 	public bool IsDeleteEnabled { get; set; }
-	
 	public Point StartPoint { get; set; }
-
 	public bool IsSelecting { get; set; }
-	
 	public bool MouseMoved { get; set; }
-
 	private string _searchText;
 	public string SearchText
 	{
@@ -70,9 +64,15 @@ public partial class DatabaseViewModel : BaseViewModel
 	[System.Text.RegularExpressions.GeneratedRegex(@"^[0-9.]+$")]
 	private static partial System.Text.RegularExpressions.Regex MyRegex();
 
-	public DatabaseViewModel()
+	public DatabaseViewModel(INavigationService navigationService, TransactionService transactionService, ILogger<DatabaseViewModel> logger)
 	{
-		Years = [];
+        _logger = logger;
+		_transactionService = transactionService;
+		_navigationService = navigationService;
+
+        _logger.LogInformation("Создание экземпляра DatabaseViewModel.");
+
+        Years = [];
 		SelectedYears = [];
 
 		LbMouseLeftButtonDownCommand = new RelayCommand<MouseButtonEventArgs>(OnPreviewMouseLeftButtonDown);
@@ -92,17 +92,26 @@ public partial class DatabaseViewModel : BaseViewModel
 
 	private async Task LoadDataAsync()
 	{
-		await using var context = new DashboardDbContext();
+        _logger.LogInformation("Загрузка данных начата.");
 
-		var transactions = await context.Transactions.ToListAsync();
-		var years = await context.Transactions.Select(m => m.Date.Year.ToString()).Distinct().ToListAsync();
-
-		UpdateUi(years, transactions);
+		try
+		{
+            var transactions = await _transactionService.GetAllTransactionsAsync();
+            var years = await _transactionService.GetDistinctYearsAsync();
+            UpdateUi(years, transactions);
+            _logger.LogInformation("Данные успешно загружены.");
+        }
+		catch (Exception ex)
+		{
+            _logger.LogError(ex, "Ошибка при загрузке данных из БД.");
+            _logger.LogCritical(ex, "Критическая ошибка при загрузке данных. Приложение не может продолжать работу.");
+        }
 	}
 
 	private void OnTransactionAdded(object sender, EventArgs e)
 	{
-		_ = LoadDataAsync();
+        _logger.LogInformation("Добавлена новая транзакция. Обновление данных.");
+        _ = LoadDataAsync();
 		ApplyFilters();
 	}
 
@@ -122,11 +131,15 @@ public partial class DatabaseViewModel : BaseViewModel
 		SelectedYears?.Clear();
 
 		for (var i = 0; i < Years?.Count; i++) SelectedYears?.Add(i);
-	}
+
+        _logger.LogInformation("Инициализация выбранных элементов завершена.");
+    }
 
 	private async void ApplyFilters()
 	{
-		if (Transactions == null || SelectedYears == null)
+        _logger.LogInformation("Применение фильтров к транзакциям.");
+
+        if (Transactions == null || SelectedYears == null)
 		{
 			FilteredTransactions = Transactions;
 			return;
@@ -134,22 +147,31 @@ public partial class DatabaseViewModel : BaseViewModel
 
 		var selectedYears = SelectedYears.Select(index => Years[index]).ToList();
 		var searchTextLower = SearchText?.ToLower();
-		
-		var filteredTransactions = await Task.Run(() =>
-		{
-			return Transactions
-				.Where(transaction =>
-					selectedYears.Contains(transaction.Date.Year.ToString()) &&
-					(string.IsNullOrEmpty(SearchText) ||
-					 transaction.Date.ToString().ToLower().Contains(searchTextLower) ||
-					 transaction.Type.ToLower().Contains(searchTextLower) ||
-					 transaction.Amount.ToString().ToLower().Contains(searchTextLower) ||
-					 transaction.Category.ToLower().Contains(searchTextLower)))
-				.ToList();
-		});
 
-		FilteredTransactions = new ObservableCollection<Transaction>(filteredTransactions);
-	}
+        try
+        {
+            var filteredTransactions = await Task.Run(() =>
+            {
+                return Transactions
+                    .Where(transaction =>
+                        selectedYears.Contains(transaction.Date.Year.ToString()) &&
+                        (string.IsNullOrEmpty(SearchText) ||
+                         transaction.Date.ToString().ToLower().Contains(searchTextLower) ||
+                         transaction.Type.ToLower().Contains(searchTextLower) ||
+                         transaction.Amount.ToString().ToLower().Contains(searchTextLower) ||
+                         transaction.Category.ToLower().Contains(searchTextLower)))
+                    .ToList();
+            });
+
+            FilteredTransactions = new ObservableCollection<Transaction>(filteredTransactions);
+
+            _logger.LogInformation("Фильтры успешно применены.");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Ошибка при применении фильтров к транзакциям.");
+        }
+    }
 
 	private void OnDataGridSelectionChanged(object parameter)
 	{
@@ -157,7 +179,8 @@ public partial class DatabaseViewModel : BaseViewModel
 		if (args?.Source is not DataGrid dataGrid) return;
 		
 		SelectedTransaction = dataGrid.SelectedItem as Transaction;
-	}
+        _logger.LogInformation("Изменен выбранный элемент в DataGrid.");
+    }
 	
 	private void OnPreviewMouseLeftButtonDown(object parameter)
 	{
@@ -170,7 +193,9 @@ public partial class DatabaseViewModel : BaseViewModel
 		if (isCtrlPressed || isAltPressed) return;
 		StartPoint = args.GetPosition(listBox);
 		IsSelecting = true;
-	}
+
+        _logger.LogInformation("Начато выделение мышью в ListBox.");
+    }
 
 	private void OnPreviewMouseMove(object parameter)
 	{
@@ -187,7 +212,9 @@ public partial class DatabaseViewModel : BaseViewModel
 		var currentPoint = args.GetPosition(listBox);
 		var rect = new Rect(StartPoint, currentPoint);
 		UpdateSelection(listBox, rect);
-	}
+
+        _logger.LogInformation("Процесс выделения мышью в ListBox продолжается.");
+    }
 
 	private void OnPreviewMouseLeftButtonUp(object parameter)
 	{
@@ -207,11 +234,15 @@ public partial class DatabaseViewModel : BaseViewModel
 		MouseMoved = false;
 
 		ApplyFilters();
-	}
+        _logger.LogInformation("Завершено выделение мышью в ListBox.");
+
+
+    }
 	
-	private static void OnOpenAddNewItemWindowCommand(object parameter)
+	private void OnOpenAddNewItemWindowCommand(object parameter)
 	{
-		AddTransactionView addTransactionView = new();
+        _logger.LogInformation("Открытие окна для добавления новой транзакции.");
+        var addTransactionView = new AddTransactionView(_logger);
 		addTransactionView.ShowDialog();
 	}
 
@@ -219,28 +250,29 @@ public partial class DatabaseViewModel : BaseViewModel
 	{
 		if (SelectedTransaction == null) return;
 
-		var addTransactionWindow = new AddTransactionView(SelectedTransaction);
+        _logger.LogInformation($"Редактирование транзакции с ID: {SelectedTransaction.Id}");
+        var addTransactionWindow = new AddTransactionView(SelectedTransaction, _logger);
 		addTransactionWindow.ShowDialog();
 	}
 
-	private void DeleteTransaction(object parameter)
+	private async void DeleteTransaction(object parameter)
 	{
 		if (SelectedTransaction == null) return;
 		var confirmation = MessageBox.Show("Вы уверены что хотите удалить выделенную транзакцию?", "Удалить транзакцию", MessageBoxButton.YesNo, MessageBoxImage.Question);
 
 		if (confirmation != MessageBoxResult.Yes) return;
-		using (var context = new DashboardDbContext())
-		{
-			var existingTransaction = context.Transactions.Find(SelectedTransaction.Id);
-			if (existingTransaction != null)
-			{
-				context.Transactions.Remove(existingTransaction);
-				context.SaveChanges();
-			}
-		}
 
-		_ = LoadDataAsync();
-	}
+        try
+        {
+            await _transactionService.DeleteTransactionAsync(SelectedTransaction.Id);
+            _logger.LogInformation($"Транзакция с ID: {SelectedTransaction.Id} успешно удалена.");
+            await LoadDataAsync();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Ошибка при удалении транзакции с ID: {SelectedTransaction.Id}.");
+        }
+    }
 
 	private void UpdateSelection(ListBox listBox, Rect selectionRect, bool isSimpleClick = false)
 	{
@@ -268,7 +300,9 @@ public partial class DatabaseViewModel : BaseViewModel
 			}
 
 		}
-	}
+
+        _logger.LogInformation("Обновление выделения элементов в ListBox завершено.");
+    }
 
 	private static bool IsItemIntersectsWithSelectionRect(ListBox listBox, int itemIndex, Rect selectionRect)
 	{

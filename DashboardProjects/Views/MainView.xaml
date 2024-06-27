@@ -11,6 +11,7 @@
     Height="910"
     MinWidth="1366"
     MinHeight="768"
+    d:DataContext="{d:DesignInstance Type=vm:MainViewModel}"
     AllowsTransparency="True"
     Background="Transparent"
     FontFamily="/Assets/Fonts/#Oswald Regular"
@@ -25,10 +26,6 @@
             <i:InvokeCommandAction Command="{Binding WindowKeyDowCommand}" PassEventArgsToCommand="True" />
         </i:EventTrigger>
     </i:Interaction.Triggers>
-
-    <Window.DataContext>
-        <vm:MainViewModel />
-    </Window.DataContext>
 
     <Border
         Background="#25292E"
@@ -75,7 +72,7 @@
 
                             <RadioButton
                                 Margin="0,40,0,5"
-                                Command="{Binding UpdateViewCommand}"
+                                Command="{Binding NavigateHomeCommand}"
                                 CommandParameter="Home"
                                 IsChecked="True"
                                 Style="{DynamicResource MenuRadioButtonStyle}"
@@ -93,7 +90,7 @@
 
                             <RadioButton
                                 Margin="0,5,0,5"
-                                Command="{Binding UpdateViewCommand}"
+                                Command="{Binding NavigateDatabaseCommand}"
                                 CommandParameter="Database"
                                 Style="{DynamicResource MenuRadioButtonStyle}"
                                 Tag="{DynamicResource Database}">
@@ -110,7 +107,6 @@
 
                             <RadioButton
                                 Margin="0,5,0,5"
-                                Command="{Binding UpdateViewCommand}"
                                 CommandParameter="Bookmarks"
                                 Style="{DynamicResource MenuRadioButtonStyle}"
                                 Tag="{DynamicResource Bookmarks}">
@@ -127,7 +123,6 @@
 
                             <RadioButton
                                 Margin="0,5,0,5"
-                                Command="{Binding UpdateViewCommand}"
                                 CommandParameter="Settings"
                                 Style="{DynamicResource MenuRadioButtonStyle}"
                                 Tag="{DynamicResource Settings}">
@@ -270,7 +265,7 @@
                 </Border>
 
                 <Grid Grid.Row="1">
-                    <ContentControl Content="{Binding SelectedViewModel}" />
+                    <ContentControl Content="{Binding Path=Navigation.CurrentView}" />
                 </Grid>
 
             </Grid>

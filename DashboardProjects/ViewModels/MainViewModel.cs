@@ -1,25 +1,16 @@
 using DashboardProjects.Commands;
+using DashboardProjects.Services;
 using System.Windows.Input;
 
 namespace DashboardProjects.ViewModels;
 
 public class MainViewModel : BaseViewModel
 {
-    private BaseViewModel _selectedViewModel;
-
-    public BaseViewModel SelectedViewModel
-    {
-        get => _selectedViewModel;
-        set
-        {
-            _selectedViewModel = value;
-            OnPropertyChanged(nameof(SelectedViewModel));
-        }
-    }
+    public INavigationService Navigation { get; }
 
 	public ICommand WindowKeyDowCommand { get; private set; }
-
-	public ICommand UpdateViewCommand { get; }
+    public RelayCommand NavigateDatabaseCommand { get; }
+    public RelayCommand NavigateHomeCommand { get; }
 
     public ICommand DragMoveCommand { get; }
     public ICommand MouseEnterCommand { get; }
@@ -29,21 +20,21 @@ public class MainViewModel : BaseViewModel
     public ICommand MaximizeRestoreCommand { get; }
     public ICommand CloseCommand { get; }
 
-	public MainViewModel()
+	public MainViewModel(INavigationService navigationService)
     {
-		WindowKeyDowCommand = new RelayCommand<KeyEventArgs>(OnWindowKeyDow);
-
-		UpdateViewCommand = new UpdateViewCommand(this);
-        
+        WindowKeyDowCommand = new RelayCommand<KeyEventArgs>(OnWindowKeyDow);
         DragMoveCommand = new DragMoveCommand();
         MouseEnterCommand = new RelayCommand(OnMouseEnter);
         MouseLeaveCommand = new RelayCommand(OnMouseLeave);
-        
+        NavigateDatabaseCommand = new RelayCommand(o => { Navigation.NavigateTo<DatabaseViewModel>(); }, o => true);
+        NavigateHomeCommand = new RelayCommand(o => { Navigation.NavigateTo<HomeViewModel>(); }, o => true);
+
         MinimizeCommand = new MinimizeCommand();
         MaximizeRestoreCommand = new MaximizeRestoreCommand();
         CloseCommand = new CloseCommand();
-        
-        SelectedViewModel = new HomeViewModel();
+
+        Navigation = navigationService;
+        Navigation.NavigateTo<HomeViewModel>();
     }
 
 	private static void OnWindowKeyDow(object parameter)

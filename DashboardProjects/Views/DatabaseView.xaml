@@ -11,12 +11,9 @@
     xmlns:vm="clr-namespace:DashboardProjects.ViewModels"
     d:DesignHeight="800"
     d:DesignWidth="1300"
+    d:DataContext="{d:DesignInstance Type=vm:DatabaseViewModel}"
     FontFamily="/Assets/Fonts/#Oswald Regular"
     mc:Ignorable="d">
-
-    <UserControl.DataContext>
-        <vm:DatabaseViewModel />
-    </UserControl.DataContext>
 
     <UserControl.Resources>
         <ResourceDictionary>

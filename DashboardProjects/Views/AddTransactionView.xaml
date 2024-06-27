@@ -16,10 +16,6 @@
     FontFamily="/Assets/Fonts/#Oswald Regular"
     mc:Ignorable="d">
 
-    <Window.DataContext>
-        <vm:AddTransactionViewModel />
-    </Window.DataContext>
-
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>

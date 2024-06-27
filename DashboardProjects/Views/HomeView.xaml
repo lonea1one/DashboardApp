@@ -11,12 +11,9 @@
     xmlns:vm="clr-namespace:DashboardProjects.ViewModels"
     d:DesignHeight="800"
     d:DesignWidth="1300"
+    d:DataContext="{d:DesignInstance Type=vm:HomeViewModel}"
     FontFamily="/Assets/Fonts/#Oswald Regular"
     mc:Ignorable="d">
-
-    <UserControl.DataContext>
-        <vm:HomeViewModel />
-    </UserControl.DataContext>
 
     <UserControl.Resources>
         <conv:BalanceToColorConverter x:Key="BalanceToColorConverter" />
@@ -340,6 +337,7 @@
                                 <i:Interaction.Behaviors>
                                     <iv:ListBoxSelectionBehavior SelectedItems="{Binding SelectedExpenses}" />
                                 </i:Interaction.Behaviors>
+                                
                                 <i:Interaction.Triggers>
                                     <i:EventTrigger EventName="PreviewMouseLeftButtonDown">
                                         <i:InvokeCommandAction Command="{Binding LbMouseLeftButtonDownCommand}" PassEventArgsToCommand="True" />

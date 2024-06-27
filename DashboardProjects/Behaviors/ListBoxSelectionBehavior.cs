@@ -22,12 +22,16 @@ public class ListBoxSelectionBehavior : Behavior<ListBox>
         set => SetValue(SelectedItemsProperty, value);
     }
 
-	protected override void OnAttached()
+    protected override void OnAttached()
     {
         base.OnAttached();
         AssociatedObject.MouseEnter += OnMouseEnter;
         AssociatedObject.MouseLeave += OnMouseLeave;
-        SelectedItems.CollectionChanged += OnSelectedItemsCollectionChanged;
+
+        if (SelectedItems != null)
+        {
+            SelectedItems.CollectionChanged += OnSelectedItemsCollectionChanged;
+        }
     }
 
     protected override void OnDetaching()
@@ -35,7 +39,11 @@ public class ListBoxSelectionBehavior : Behavior<ListBox>
         base.OnDetaching();
         AssociatedObject.MouseEnter -= OnMouseEnter;
         AssociatedObject.MouseLeave -= OnMouseLeave;
-        SelectedItems.CollectionChanged -= OnSelectedItemsCollectionChanged;
+
+        if (SelectedItems != null)
+        {
+            SelectedItems.CollectionChanged -= OnSelectedItemsCollectionChanged;
+        }
     }
 
     private void OnMouseEnter(object sender, MouseEventArgs e)
