@@ -29,7 +29,7 @@ public partial class DatabaseViewModel : BaseViewModel
 		set
 		{
 			_selectedTransaction = value;
-			OnPropertyChanged(nameof(SelectedTransaction));
+			OnPropertyChanged();
 			IsEditEnabled = _selectedTransaction != null;
 			IsDeleteEnabled = _selectedTransaction != null;
 		}
@@ -56,7 +56,7 @@ public partial class DatabaseViewModel : BaseViewModel
 		set
 		{
 			_searchText = value;
-			OnPropertyChanged(nameof(SearchText));
+			OnPropertyChanged();
 			ApplyFilters();
 		}
 	}

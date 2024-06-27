@@ -15,7 +15,7 @@ public sealed class DashboardDbContext : DbContext
                         .SetBasePath(Directory.GetCurrentDirectory())
                         .Build();
 
-        optionsBuilder.UseSqlServer(config.GetConnectionString("SQLServerWorkConnection"));
+        optionsBuilder.UseSqlServer(config.GetConnectionString("SQLServerConnection"));
     }
 
 	protected override void OnModelCreating(ModelBuilder modelBuilder)

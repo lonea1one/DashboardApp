@@ -12,22 +12,18 @@ namespace DashboardProjects
     public partial class App
     {
         private readonly IServiceProvider _serviceProvider;
-
+        
         public App()
         {
             IServiceCollection services = new ServiceCollection();
             ConfigureServices(services);
             _serviceProvider = services.BuildServiceProvider();
-
+            
             Log.Logger = new LoggerConfiguration()
-               .MinimumLevel.Verbose()
-               .WriteTo.Console()
-               .WriteTo.File("logs/log-.txt", rollingInterval: RollingInterval.Day)
-               .CreateLogger();
-
-            // Настройка встроенного логгера
-            var loggerFactory = _serviceProvider.GetRequiredService<ILoggerFactory>();
-            loggerFactory.AddSerilog();
+	            .MinimumLevel.Verbose()
+	            .WriteTo.Console()
+	            .WriteTo.File("logs/log-.txt", rollingInterval: RollingInterval.Day)
+	            .CreateLogger();
         }
 
         private void ConfigureServices(IServiceCollection services)

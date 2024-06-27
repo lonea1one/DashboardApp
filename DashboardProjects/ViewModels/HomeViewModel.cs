@@ -118,7 +118,7 @@ public class HomeViewModel : BaseViewModel
 		{
 			if (_hasIncomeData == value) return;
 			_hasIncomeData = value;
-			OnPropertyChanged(nameof(HasIncomeData));
+			OnPropertyChanged();
 		}
 	}
 	
@@ -134,7 +134,7 @@ public class HomeViewModel : BaseViewModel
 		{
 			if (_progressVisibility == value) return;
 			_progressVisibility = value;
-			OnPropertyChanged(nameof(ProgressVisibility));
+			OnPropertyChanged();
 		}
 	}
 
@@ -146,7 +146,7 @@ public class HomeViewModel : BaseViewModel
 		{
 			if (_uploadVisibility == value) return;
 			_uploadVisibility = value;
-			OnPropertyChanged(nameof(UploadVisibility));
+			OnPropertyChanged();
 		}
 	}
 	
@@ -474,7 +474,7 @@ public class HomeViewModel : BaseViewModel
 	#endregion
 
 	#region Инициализация диаграммы и графика
-	private void InitializeSelectedItems()
+	private async void InitializeSelectedItems()
 	{
         try
         {
@@ -495,8 +495,8 @@ public class HomeViewModel : BaseViewModel
             UpdateBalanceForCurrentMonth();
             CalculateQuarterlyBalancesAsync();
 
-            InitializePieChartSeries("РАСХОДЫ", ExpenseCollection, GetExpenseChartColors());
-            InitializePieChartSeries("ДОХОДЫ", IncomeCollection, GetIncomeChartColors());
+            await InitializePieChartSeries("РАСХОДЫ", ExpenseCollection, GetExpenseChartColors());
+            await InitializePieChartSeries("ДОХОДЫ", IncomeCollection, GetIncomeChartColors());
 
             _logger.LogInformation("Инициализация выбранных элементов завершена.");
         }
@@ -506,7 +506,7 @@ public class HomeViewModel : BaseViewModel
         }
     }
 
-	private async void InitializePieChartSeries(string type, SeriesCollection collection, List<Brush> colors)
+	private async Task InitializePieChartSeries(string type, SeriesCollection collection, IReadOnlyList<Brush> colors)
 	{
         try
         {
